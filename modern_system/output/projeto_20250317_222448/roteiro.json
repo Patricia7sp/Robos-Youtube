@@ -1,0 +1,104 @@
+[
+  {
+    "scene_number": 1,
+    "title": "Cena 1",
+    "location": "universidade",
+    "characters": [
+      "Alice"
+    ],
+    "narration": "Era uma tarde ensolarada de primavera quando Alice, uma estudante de literatura na Universidade de Oxford,",
+    "dialogues": [],
+    "animation_directions": [
+      "Mostrar o cenário: universidade",
+      "Introduzir personagem: Alice"
+    ],
+    "visual_elements": []
+  },
+  {
+    "scene_number": 2,
+    "title": "Cena 2",
+    "location": "jardim",
+    "characters": [
+      "Alice",
+      "Mia"
+    ],
+    "narration": "encontrou uma ninhada de gatinhos abandonados no jardim do campus. Eram cinco filhotes, todos malhados\ncomo sua mãe, uma gata cinzenta que Alice conhecia bem e chamava de Mia.\nAlice sabia que animais não eram permitidos nos dormitórios, mas não podia deixar os filhotes à própria sorte.",
+    "dialogues": [],
+    "animation_directions": [
+      "Mostrar o cenário: jardim",
+      "Introduzir personagem: Alice",
+      "Introduzir personagem: Mia"
+    ],
+    "visual_elements": [
+      "filhotes",
+      "jardim"
+    ]
+  },
+  {
+    "scene_number": 3,
+    "title": "Cena 3",
+    "location": "jardim",
+    "characters": [
+      "Alice",
+      "Mia",
+      "Ludovico",
+      "professor"
+    ],
+    "narration": "Decidiu escondê-los temporariamente em um cantinho isolado do jardim, atrás de uma moita de rosas,\nenquanto pensava em uma solução.\nTodos os dias, Alice levava leite e comida para Mia e seus filhotes. Numa dessas visitas, notou um homem\nde aparência excêntrica observando-a atentamente. Era o Professor Ludovico, que lecionava matemática\ne tinha fama de ser extremamente rigoroso e um tanto quanto estranho.\n\"Senhorita Alice, o que faz escondida entre as roseiras?\", perguntou ele, ajustando os óculos no nariz pontudo.\nAlice congelou. Seria o fim de seu pequeno refúgio para os gatos? Para sua surpresa, quando explicou a situação,\no professor sorriu.\n\"Eu também tenho um fraco por felinos\", confessou ele. \"Minha casa tem espaço suficiente para todos eles,\nincluindo a mãe.\"\nAliviada, Alice ajudou o professor a transferir os gatos para sua casa, uma charmosa residência vitoriana\npróxima ao campus. Lá dentro, Alice ficou maravilhada com a quantidade de livros, quebra-cabeças matemáticos,\ne curiosidades que decoravam o lugar.\n\"Você gosta de jogos, senhorita Alice?\", perguntou o professor, mostrando um tabuleiro de xadrez com peças\nesculpidas à mão.\nEnquanto jogavam, o professor contava histórias fantásticas, misturando matemática e fantasia de um jeito\nque Alice nunca tinha imaginado ser possível.\nO tempo passou, e Alice tornou-se uma visitante regular na casa do professor. Ajudava a cuidar dos gatos\ne ouvia, fascinada, as histórias cada vez mais elaboradas que ele contava.\nUm dia, ao chegar para uma visita, Alice encontrou o professor apressado, consultando repetidamente um\nrelógio de bolso.\n\"Estou atrasado, muito atrasado!\", exclamou ele.\n\"Para onde vai com tanta pressa, professor?\", perguntou Alice, intrigada.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "los temporariamente em um cantinho isolado do jardim, atrás de uma moita de rosas, enquanto pensava em uma solução. Todos os dias, Alice levava leite e comida para Mia e seus filhotes. Numa dessas visitas, notou um homem de aparência excêntrica observando"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "cabeças matemáticos, e curiosidades que decoravam o lugar. \"Você gosta de jogos, senhorita Alice?\", perguntou o professor, mostrando um tabuleiro de xadrez com peças esculpidas à mão. Enquanto jogavam, o professor contava histórias fantásticas, misturando matemática e fantasia de um jeito que Alice nunca tinha imaginado ser possível. O tempo passou, e Alice tornou"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: jardim",
+      "Introduzir personagem: Alice",
+      "Introduzir personagem: Mia",
+      "Introduzir personagem: Ludovico",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": [
+      "gatos",
+      "filhotes",
+      "jardim",
+      "xadrez",
+      "peças"
+    ]
+  },
+  {
+    "scene_number": 4,
+    "title": "Cena 4",
+    "location": "barco",
+    "characters": [
+      "Alice",
+      "professor"
+    ],
+    "narration": "\"Para um passeio de barco pelo Tâmisa com algumas crianças. Quer vir? Prometo contar uma história especial.\"\nAlice sorriu e aceitou o convite. Enquanto caminhavam para o rio, não pôde deixar de notar um coelho branco\nque cruzou seu caminho, parecendo tão apressado quanto o professor.",
+    "dialogues": [],
+    "animation_directions": [
+      "Mostrar o cenário: barco",
+      "Introduzir personagem: Alice",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": [
+      "coelho"
+    ]
+  },
+  {
+    "scene_number": 5,
+    "title": "Cena 5",
+    "location": "barco",
+    "characters": [],
+    "narration": "Aquela tarde de barco seria o início de uma amizade que inspiraria uma das mais famosas histórias da literatura infantil.",
+    "dialogues": [],
+    "animation_directions": [
+      "Mostrar o cenário: barco"
+    ],
+    "visual_elements": []
+  }
+]

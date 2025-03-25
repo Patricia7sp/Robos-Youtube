@@ -1,0 +1,202 @@
+{
+  "1": {
+    "scene_number": 1,
+    "narration": [
+      "[Simulado] narration_scene_001_segment_001.mp3",
+      "[Simulado] narration_scene_001_segment_002.mp3",
+      "[Simulado] narration_scene_001_segment_003.mp3"
+    ],
+    "dialogues": {}
+  },
+  "2": {
+    "scene_number": 2,
+    "narration": [
+      "[Simulado] narration_scene_002_segment_001.mp3",
+      "[Simulado] narration_scene_002_segment_002.mp3",
+      "[Simulado] narration_scene_002_segment_003.mp3",
+      "[Simulado] narration_scene_002_segment_004.mp3",
+      "[Simulado] narration_scene_002_segment_005.mp3",
+      "[Simulado] narration_scene_002_segment_006.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_002_desconhecido_001.mp3",
+        "[Simulado] dialogue_scene_002_desconhecido_002.mp3"
+      ]
+    }
+  },
+  "3": {
+    "scene_number": 3,
+    "narration": [
+      "[Simulado] narration_scene_003_segment_001.mp3",
+      "[Simulado] narration_scene_003_segment_002.mp3",
+      "[Simulado] narration_scene_003_segment_003.mp3",
+      "[Simulado] narration_scene_003_segment_004.mp3",
+      "[Simulado] narration_scene_003_segment_005.mp3",
+      "[Simulado] narration_scene_003_segment_006.mp3",
+      "[Simulado] narration_scene_003_segment_007.mp3",
+      "[Simulado] narration_scene_003_segment_008.mp3",
+      "[Simulado] narration_scene_003_segment_009.mp3",
+      "[Simulado] narration_scene_003_segment_010.mp3",
+      "[Simulado] narration_scene_003_segment_011.mp3",
+      "[Simulado] narration_scene_003_segment_012.mp3",
+      "[Simulado] narration_scene_003_segment_013.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_003_desconhecido_001.mp3",
+        "[Simulado] dialogue_scene_003_desconhecido_002.mp3"
+      ]
+    }
+  },
+  "4": {
+    "scene_number": 4,
+    "narration": [
+      "[Simulado] narration_scene_004_segment_001.mp3",
+      "[Simulado] narration_scene_004_segment_002.mp3",
+      "[Simulado] narration_scene_004_segment_003.mp3",
+      "[Simulado] narration_scene_004_segment_004.mp3",
+      "[Simulado] narration_scene_004_segment_005.mp3",
+      "[Simulado] narration_scene_004_segment_006.mp3",
+      "[Simulado] narration_scene_004_segment_007.mp3",
+      "[Simulado] narration_scene_004_segment_008.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_004_desconhecido_001.mp3",
+        "[Simulado] dialogue_scene_004_desconhecido_002.mp3",
+        "[Simulado] dialogue_scene_004_desconhecido_003.mp3",
+        "[Simulado] dialogue_scene_004_desconhecido_004.mp3",
+        "[Simulado] dialogue_scene_004_desconhecido_005.mp3"
+      ]
+    }
+  },
+  "5": {
+    "scene_number": 5,
+    "narration": [
+      "[Simulado] narration_scene_005_segment_001.mp3",
+      "[Simulado] narration_scene_005_segment_002.mp3",
+      "[Simulado] narration_scene_005_segment_003.mp3",
+      "[Simulado] narration_scene_005_segment_004.mp3",
+      "[Simulado] narration_scene_005_segment_005.mp3",
+      "[Simulado] narration_scene_005_segment_006.mp3",
+      "[Simulado] narration_scene_005_segment_007.mp3",
+      "[Simulado] narration_scene_005_segment_008.mp3",
+      "[Simulado] narration_scene_005_segment_009.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_005_desconhecido_001.mp3",
+        "[Simulado] dialogue_scene_005_desconhecido_002.mp3",
+        "[Simulado] dialogue_scene_005_desconhecido_003.mp3",
+        "[Simulado] dialogue_scene_005_desconhecido_004.mp3",
+        "[Simulado] dialogue_scene_005_desconhecido_005.mp3",
+        "[Simulado] dialogue_scene_005_desconhecido_006.mp3"
+      ]
+    }
+  },
+  "6": {
+    "scene_number": 6,
+    "narration": [
+      "[Simulado] narration_scene_006_segment_001.mp3",
+      "[Simulado] narration_scene_006_segment_002.mp3",
+      "[Simulado] narration_scene_006_segment_003.mp3",
+      "[Simulado] narration_scene_006_segment_004.mp3",
+      "[Simulado] narration_scene_006_segment_005.mp3",
+      "[Simulado] narration_scene_006_segment_006.mp3",
+      "[Simulado] narration_scene_006_segment_007.mp3",
+      "[Simulado] narration_scene_006_segment_008.mp3",
+      "[Simulado] narration_scene_006_segment_009.mp3",
+      "[Simulado] narration_scene_006_segment_010.mp3",
+      "[Simulado] narration_scene_006_segment_011.mp3",
+      "[Simulado] narration_scene_006_segment_012.mp3",
+      "[Simulado] narration_scene_006_segment_013.mp3",
+      "[Simulado] narration_scene_006_segment_014.mp3",
+      "[Simulado] narration_scene_006_segment_015.mp3",
+      "[Simulado] narration_scene_006_segment_016.mp3",
+      "[Simulado] narration_scene_006_segment_017.mp3",
+      "[Simulado] narration_scene_006_segment_018.mp3",
+      "[Simulado] narration_scene_006_segment_019.mp3",
+      "[Simulado] narration_scene_006_segment_020.mp3",
+      "[Simulado] narration_scene_006_segment_021.mp3",
+      "[Simulado] narration_scene_006_segment_022.mp3",
+      "[Simulado] narration_scene_006_segment_023.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_006_desconhecido_001.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_002.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_003.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_004.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_005.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_006.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_007.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_008.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_009.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_010.mp3",
+        "[Simulado] dialogue_scene_006_desconhecido_011.mp3"
+      ]
+    }
+  },
+  "7": {
+    "scene_number": 7,
+    "narration": [
+      "[Simulado] narration_scene_007_segment_001.mp3",
+      "[Simulado] narration_scene_007_segment_002.mp3",
+      "[Simulado] narration_scene_007_segment_003.mp3",
+      "[Simulado] narration_scene_007_segment_004.mp3",
+      "[Simulado] narration_scene_007_segment_005.mp3",
+      "[Simulado] narration_scene_007_segment_006.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_007_desconhecido_001.mp3"
+      ]
+    }
+  },
+  "8": {
+    "scene_number": 8,
+    "narration": [
+      "[Simulado] narration_scene_008_segment_001.mp3",
+      "[Simulado] narration_scene_008_segment_002.mp3",
+      "[Simulado] narration_scene_008_segment_003.mp3",
+      "[Simulado] narration_scene_008_segment_004.mp3",
+      "[Simulado] narration_scene_008_segment_005.mp3",
+      "[Simulado] narration_scene_008_segment_006.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_008_desconhecido_001.mp3",
+        "[Simulado] dialogue_scene_008_desconhecido_002.mp3"
+      ]
+    }
+  },
+  "9": {
+    "scene_number": 9,
+    "narration": [
+      "[Simulado] narration_scene_009_segment_001.mp3"
+    ],
+    "dialogues": {}
+  },
+  "10": {
+    "scene_number": 10,
+    "narration": [
+      "[Simulado] narration_scene_010_segment_001.mp3",
+      "[Simulado] narration_scene_010_segment_002.mp3"
+    ],
+    "dialogues": {
+      "Desconhecido": [
+        "[Simulado] dialogue_scene_010_desconhecido_001.mp3"
+      ]
+    }
+  },
+  "11": {
+    "scene_number": 11,
+    "narration": [
+      "[Simulado] narration_scene_011_segment_001.mp3",
+      "[Simulado] narration_scene_011_segment_002.mp3",
+      "[Simulado] narration_scene_011_segment_003.mp3"
+    ],
+    "dialogues": {}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "scene_number": 2,
+  "narration": [
+    "[Simulado] narration_scene_002_segment_001.mp3",
+    "[Simulado] narration_scene_002_segment_002.mp3",
+    "[Simulado] narration_scene_002_segment_003.mp3",
+    "[Simulado] narration_scene_002_segment_004.mp3",
+    "[Simulado] narration_scene_002_segment_005.mp3",
+    "[Simulado] narration_scene_002_segment_006.mp3"
+  ],
+  "dialogues": {
+    "Desconhecido": [
+      "[Simulado] dialogue_scene_002_desconhecido_001.mp3",
+      "[Simulado] dialogue_scene_002_desconhecido_002.mp3"
+    ]
+  }
+}

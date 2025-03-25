@@ -1,0 +1,59 @@
+{
+    "title": "O Professor de Matemática",
+    "scenes": [
+        {
+            "scene_number": 1,
+            "title": "O Dilema dos Gatinhos",
+            "location": "jardim",
+            "characters": ["Alice", "Mia"],
+            "narration": "Eu preciso arrumar um jeito de esconder esses gatinhos. Já é a segunda vez que Mia dá cria, mas desta vez ela exagerou e vieram logo oito. Mamãe disse que só suportaria três de cada vez, pois as nossas já são muito levadas e gostam de se enredar nas meadas de lã quando estamos tentando tricotar.",
+            "visual_elements": ["gatos filhotes", "jardim da universidade", "árvores antigas"],
+            "mood": "preocupação e carinho"
+        },
+        {
+            "scene_number": 2,
+            "title": "A Busca no Jardim",
+            "location": "jardim",
+            "characters": ["Alice"],
+            "narration": "Bem, não vejo nesse jardim lugar algum onde esconder os filhotes e olhe que estou procurando cuidadosamente há mais de dez minutos. O jardim da universidade é imenso, e ainda assim está parecendo minúsculo no momento. Ele deve entender como me sinto.",
+            "visual_elements": ["faias antigas", "troncos grossos", "tanque de peixes"],
+            "mood": "exploração e determinação"
+        },
+        {
+            "scene_number": 3,
+            "title": "Ludovico e as Formigas",
+            "location": "jardim",
+            "characters": ["Alice", "Ludovico"],
+            "narration": "Ludovico é o único que parece entender meu amor pelos animais. Eu não digo só animais que todo mundo gosta, como cavalos, cachorros ou gatos; eu gosto também de lagartas, pássaros e besouros. Agora há pouco, por exemplo, esqueci por completo de que estou procurando um esconderijo, encontrei um formigueiro e me deitei de bruços para acompanhar o caminho das operárias.",
+            "visual_elements": ["formigueiro", "formigas trabalhando", "balança"],
+            "mood": "curiosidade e admiração"
+        },
+        {
+            "scene_number": 4,
+            "title": "O Chá com o Professor",
+            "location": "sala de jantar",
+            "characters": ["Alice", "Ludovico", "mamãe", "papai", "Lóri", "Edith"],
+            "narration": "A primeira a simpatizar com ele foi mamãe, quando o conheceu. Então ela pediu a papai que convidasse o professor de matemática da universidade para tomar chá. Lori pôde se sentar à mesa com papai, mamãe e a visita, mas eu e Edith não tivemos permissão, porque desta vez éramos pequenas demais, então ficamos espiando pela porta entreaberta da sala de jantar.",
+            "visual_elements": ["mesa de chá", "porta entreaberta", "xícaras de porcelana"],
+            "mood": "curiosidade e expectativa"
+        },
+        {
+            "scene_number": 5,
+            "title": "A Mágica do Açucareiro",
+            "location": "sala de jantar",
+            "characters": ["Alice", "Ludovico", "Lóri", "Edith", "mamãe", "papai"],
+            "narration": "E então o professor tirou a mão e algo branco saltou para fora do açucareiro, enquanto nós três gritávamos: 'Um ratinho!!!' E lá estava Ludovico, um alvo guardanapo dobrado nas mãos, piscando alegremente os olhos azuis.",
+            "visual_elements": ["açucareiro", "guardanapo branco", "mesa de chá"],
+            "mood": "alegria e encantamento"
+        },
+        {
+            "scene_number": 6,
+            "title": "A Descoberta da Toca",
+            "location": "toca",
+            "characters": ["Alice"],
+            "narration": "E por falar nisso, estou vendo uma toca. Está bem no barranco, um buraco comprido e fundo. Fui avisada muitas vezes para jamais mexer nesses buracos, porque nunca dá para saber a qual animal pertencem. Às vezes são de raposas, mas podem também ser de cobras ou de outros bichos venenosos.",
+            "visual_elements": ["toca misteriosa", "barranco", "vegetação"],
+            "mood": "mistério e esperança"
+        }
+    ]
+}

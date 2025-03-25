@@ -1,0 +1,2505 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Agente responsável pela geração de animações a partir de imagens estáticas.
+Utiliza APIs de animação para criar movimentos fluidos e transições entre cenas.
+"""
+
+import os
+import sys
+import json
+import time
+import random
+import requests
+import logging
+from typing import Dict, List, Tuple, Optional, Union, Any
+from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
+import numpy as np
+import base64
+from io import BytesIO
+import tempfile
+import shutil
+import cv2
+import math
+
+# Configuração de logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+class AnimationGeneratorAgent:
+    """Agente responsável pela geração de animações a partir de imagens estáticas."""
+    
+    def __init__(self, api_key=None, api_provider="stability", cache_enabled=True):
+        """Inicializa o agente de geração de animações.
+        
+        Args:
+            api_key: Chave da API de animação
+            api_provider: Provedor da API de animação (stability, runway, etc.)
+            cache_enabled: Se o cache de animações deve ser habilitado
+        """
+        self.api_key = api_key
+        self.api_provider = api_provider
+        self.cache_enabled = cache_enabled
+        
+        # Diretório para cache de animações
+        self.cache_dir = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            'data', 'cache', 'animations'
+        )
+        os.makedirs(self.cache_dir, exist_ok=True)
+        
+        # Inicializa o cache
+        self.animation_cache = {}
+        self.animation_metadata = {}
+        self._load_cache()
+        
+        logger.info(f"AnimationGeneratorAgent inicializado com provedor: {api_provider}")
+    
+    def _load_cache(self):
+        """Carrega o cache de animações do disco."""
+        cache_path = os.path.join(self.cache_dir, 'animation_cache.json')
+        metadata_path = os.path.join(self.cache_dir, 'animation_metadata.json')
+        
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, 'r', encoding='utf-8') as f:
+                    self.animation_cache = json.load(f)
+                logger.info(f"Cache de animações carregado: {len(self.animation_cache)} entradas")
+            except Exception as e:
+                logger.error(f"Erro ao carregar cache de animações: {str(e)}")
+        
+        if os.path.exists(metadata_path):
+            try:
+                with open(metadata_path, 'r', encoding='utf-8') as f:
+                    self.animation_metadata = json.load(f)
+                logger.info(f"Metadados de animações carregados: {len(self.animation_metadata)} entradas")
+            except Exception as e:
+                logger.error(f"Erro ao carregar metadados de animações: {str(e)}")
+    
+    def _save_cache(self):
+        """Salva o cache de animações no disco."""
+        if not self.cache_enabled:
+            return
+            
+        cache_path = os.path.join(self.cache_dir, 'animation_cache.json')
+        metadata_path = os.path.join(self.cache_dir, 'animation_metadata.json')
+        
+        try:
+            with open(cache_path, 'w', encoding='utf-8') as f:
+                json.dump(self.animation_cache, f, ensure_ascii=False, indent=2)
+            
+            with open(metadata_path, 'w', encoding='utf-8') as f:
+                json.dump(self.animation_metadata, f, ensure_ascii=False, indent=2)
+            
+            logger.info(f"Cache de animações salvo: {len(self.animation_cache)} entradas")
+        except Exception as e:
+            logger.error(f"Erro ao salvar cache de animações: {str(e)}")
+    
+    def _get_cache_key(self, source_images, animation_type, parameters):
+        """Gera uma chave de cache para uma animação.
+        
+        Args:
+            source_images: Lista de caminhos para as imagens de origem
+            animation_type: Tipo de animação (zoom, pan, morph, etc.)
+            parameters: Parâmetros adicionais para a animação
+            
+        Returns:
+            String representando a chave de cache
+        """
+        # Cria uma representação única das imagens de origem
+        image_hash = "_".join([os.path.basename(img) for img in source_images])
+        
+        # Cria uma representação dos parâmetros
+        param_str = json.dumps(parameters, sort_keys=True)
+        
+        # Combina tudo em uma chave única
+        key = f"{image_hash}_{animation_type}_{hash(param_str)}"
+        return key
+    
+    def _stability_generate_animation(self, source_images, output_path, animation_type="morph", 
+                                     duration=3.0, fps=24, seed=None, **kwargs):
+        """Gera uma animação usando a API da Stability AI.
+        
+        Args:
+            source_images: Lista de caminhos para as imagens de origem
+            output_path: Caminho para salvar a animação gerada
+            animation_type: Tipo de animação (morph, zoom, pan, etc.)
+            duration: Duração da animação em segundos
+            fps: Frames por segundo
+            seed: Seed para consistência na geração
+            **kwargs: Parâmetros adicionais para a API
+            
+        Returns:
+            bool: True se a animação foi gerada com sucesso, False caso contrário
+        """
+        logger.info(f"Gerando animação com Stability AI: {animation_type}")
+        
+        # Simula a chamada à API da Stability AI (em produção, seria substituído pela chamada real)
+        try:
+            # Em uma implementação real, aqui seria feita a chamada à API
+            # Por enquanto, vamos simular o processo
+            
+            # Carrega as imagens de origem
+            images = [Image.open(img) for img in source_images]
+            
+            # Cria um diretório temporário para os frames
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Simula a geração de frames intermediários
+                num_frames = int(duration * fps)
+                
+                # Em uma implementação real, esses frames viriam da API
+                # Por enquanto, vamos criar frames simples para demonstração
+                for i in range(num_frames):
+                    # Calcula qual imagem de origem usar como base
+                    if len(images) > 1:
+                        progress = i / (num_frames - 1)
+                        idx1 = int(progress * (len(images) - 1))
+                        idx2 = min(idx1 + 1, len(images) - 1)
+                        alpha = progress * (len(images) - 1) - idx1
+                        
+                        # Cria um blend simples entre as duas imagens
+                        if idx1 == idx2:
+                            frame = images[idx1].copy()
+                        else:
+                            # Garante que as imagens tenham o mesmo tamanho
+                            if images[idx1].size != images[idx2].size:
+                                images[idx2] = images[idx2].resize(images[idx1].size)
+                            
+                            # Blend simples (em produção, seria um morph mais sofisticado)
+                            frame = Image.blend(images[idx1].convert('RGBA'), 
+                                               images[idx2].convert('RGBA'), 
+                                               alpha)
+                    else:
+                        frame = images[0].copy()
+                    
+                    # Salva o frame
+                    frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                    frame.save(frame_path)
+                
+                # Usa FFmpeg para combinar os frames em um vídeo
+                frames_pattern = os.path.join(temp_dir, "frame_%04d.png")
+                os.system(f"ffmpeg -y -r {fps} -i {frames_pattern} -c:v libx264 -pix_fmt yuv420p -crf 23 {output_path}")
+                
+                if os.path.exists(output_path):
+                    logger.info(f"Animação gerada com sucesso: {output_path}")
+                    
+                    # Salva metadados da animação
+                    animation_info = {
+                        "type": animation_type,
+                        "duration": duration,
+                        "fps": fps,
+                        "seed": seed,
+                        "source_images": source_images,
+                        "created_at": time.time(),
+                        "parameters": kwargs
+                    }
+                    
+                    # Atualiza o cache
+                    cache_key = self._get_cache_key(source_images, animation_type, kwargs)
+                    self.animation_cache[cache_key] = output_path
+                    self.animation_metadata[cache_key] = animation_info
+                    self._save_cache()
+                    
+                    return True
+                else:
+                    logger.error(f"Falha ao gerar animação: {output_path}")
+                    return False
+                
+        except Exception as e:
+            logger.error(f"Erro ao gerar animação com Stability AI: {str(e)}")
+            return False
+    
+    def _runway_generate_animation(self, source_images, output_path, animation_type="morph", 
+                                  duration=3.0, fps=24, seed=None, **kwargs):
+        """Gera uma animação usando a API da Runway ML.
+        
+        Args:
+            source_images: Lista de caminhos para as imagens de origem
+            output_path: Caminho para salvar a animação gerada
+            animation_type: Tipo de animação (morph, zoom, pan, etc.)
+            duration: Duração da animação em segundos
+            fps: Frames por segundo
+            seed: Seed para consistência na geração
+            **kwargs: Parâmetros adicionais para a API
+            
+        Returns:
+            bool: True se a animação foi gerada com sucesso, False caso contrário
+        """
+        logger.info(f"Gerando animação com Runway ML: {animation_type}")
+        
+        # Implementação similar à do Stability, mas com a API da Runway
+        # Por enquanto, vamos redirecionar para a implementação do Stability
+        return self._stability_generate_animation(source_images, output_path, animation_type, 
+                                                duration, fps, seed, **kwargs)
+    
+    def generate_animation(self, source_images, output_path, animation_type="morph", 
+                          duration=3.0, fps=24, seed=None, force_regenerate=False, **kwargs):
+        """Gera uma animação a partir de imagens estáticas.
+        
+        Args:
+            source_images: Lista de caminhos para as imagens de origem
+            output_path: Caminho para salvar a animação gerada
+            animation_type: Tipo de animação (morph, zoom, pan, etc.)
+            duration: Duração da animação em segundos
+            fps: Frames por segundo
+            seed: Seed para consistência na geração
+            force_regenerate: Se True, força a regeneração mesmo se existir no cache
+            **kwargs: Parâmetros adicionais para a API
+            
+        Returns:
+            bool: True se a animação foi gerada com sucesso, False caso contrário
+        """
+        # Verifica se as imagens de origem existem
+        for img_path in source_images:
+            if not os.path.exists(img_path):
+                logger.error(f"Imagem de origem não encontrada: {img_path}")
+                return False
+        
+        # Cria o diretório de saída se não existir
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        # Verifica se a animação já existe no cache
+        if self.cache_enabled and not force_regenerate:
+            cache_key = self._get_cache_key(source_images, animation_type, kwargs)
+            if cache_key in self.animation_cache:
+                cached_path = self.animation_cache[cache_key]
+                if os.path.exists(cached_path):
+                    logger.info(f"Usando animação em cache: {cached_path}")
+                    # Copia a animação em cache para o caminho de saída
+                    shutil.copy2(cached_path, output_path)
+                    return True
+        
+        # Gera a animação usando o provedor configurado
+        if self.api_provider.lower() == "stability":
+            return self._stability_generate_animation(source_images, output_path, animation_type, 
+                                                    duration, fps, seed, **kwargs)
+        elif self.api_provider.lower() == "runway":
+            return self._runway_generate_animation(source_images, output_path, animation_type, 
+                                                 duration, fps, seed, **kwargs)
+        else:
+            logger.error(f"Provedor de API não suportado: {self.api_provider}")
+            return False
+    
+
+    def generate_morph_frames(self, source_image1, source_image2, num_frames=24, quality="high", seed=None, **kwargs):
+        """Gera frames intermediários para uma transição de morphing entre duas imagens.
+        
+        Args:
+            source_image1: Caminho para a primeira imagem
+            source_image2: Caminho para a segunda imagem
+            num_frames: Número de frames intermediários a serem gerados
+            quality: Qualidade do morphing ('low', 'medium', 'high')
+            seed: Seed para consistência na geração
+            **kwargs: Parâmetros adicionais para o algoritmo de morphing
+            
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        logger.info(f"Gerando {num_frames} frames de morphing entre duas imagens")
+        
+        # Cria uma chave de cache única para esta operação
+        cache_key = f"morph_{os.path.basename(source_image1)}_{os.path.basename(source_image2)}_{num_frames}_{quality}"
+        
+        # Verifica se já existe no cache
+        if self.cache_enabled and cache_key in self.animation_cache:
+            logger.info(f"Usando frames de morphing do cache: {cache_key}")
+            return self.animation_cache[cache_key]
+        
+        # Cria um diretório temporário para os frames
+        output_frames = []
+        
+        try:
+            # Carrega as imagens de origem
+            img1 = Image.open(source_image1)
+            img2 = Image.open(source_image2)
+            
+            # Redimensiona as imagens para o mesmo tamanho se necessário
+            if img1.size != img2.size:
+                # Usa o maior tamanho para manter qualidade
+                target_size = (max(img1.width, img2.width), max(img1.height, img2.height))
+                img1 = img1.resize(target_size, Image.LANCZOS)
+                img2 = img2.resize(target_size, Image.LANCZOS)
+            
+            # Converte para arrays numpy
+            img1_array = np.array(img1)
+            img2_array = np.array(img2)
+            
+            # Cria um diretório temporário para os frames
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Gera os frames intermediários
+                frame_paths = []
+                
+                # Dependendo do provedor de API configurado, usa diferentes métodos
+                if self.api_provider == "stability" and self.api_key:
+                    # Usa a API da Stability para morphing de alta qualidade
+                    frame_paths = self._stability_generate_morph_frames(
+                        source_image1, source_image2, temp_dir, num_frames, quality, seed, **kwargs
+                    )
+                else:
+                    # Fallback: Usa interpolação linear simples
+                    for i in range(num_frames):
+                        # Calcula o fator de interpolação
+                        alpha = i / (num_frames - 1) if num_frames > 1 else 0.5
+                        
+                        # Aplica suavização para tornar a transição mais natural
+                        if quality == "high":
+                            # Usa uma curva suave (ease-in-out)
+                            alpha = 0.5 * (1 - np.cos(np.pi * alpha))
+                        
+                        # Interpola entre as duas imagens
+                        blended = (1 - alpha) * img1_array + alpha * img2_array
+                        
+                        # Converte para imagem PIL e salva
+                        frame = Image.fromarray(blended.astype(np.uint8))
+                        frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                        frame.save(frame_path)
+                        frame_paths.append(frame_path)
+                
+                # Copia os frames para um local permanente
+                morph_cache_dir = os.path.join(self.cache_dir, "morphs", cache_key)
+                os.makedirs(morph_cache_dir, exist_ok=True)
+                
+                for i, frame_path in enumerate(frame_paths):
+                    perm_path = os.path.join(morph_cache_dir, f"frame_{i:04d}.png")
+                    shutil.copy2(frame_path, perm_path)
+                    output_frames.append(perm_path)
+                
+                # Salva no cache
+                if self.cache_enabled:
+                    self.animation_cache[cache_key] = output_frames
+                    self.animation_metadata[cache_key] = {
+                        "source_images": [source_image1, source_image2],
+                        "num_frames": num_frames,
+                        "quality": quality,
+                        "timestamp": time.time()
+                    }
+                    self._save_cache()
+                
+                logger.info(f"Gerados {len(output_frames)} frames de morphing")
+                return output_frames
+                
+        except Exception as e:
+            logger.error(f"Erro ao gerar frames de morphing: {str(e)}")
+            # Retorna listas vazias em caso de erro
+            return []
+    
+    def _add_sparkle_effect(self, image, progress, **kwargs):
+        """Adiciona efeito de sparkle/estrelas à imagem.
+        
+        Args:
+            image: Imagem PIL para adicionar o efeito
+            progress: Progresso da transição (0.0 a 1.0)
+            **kwargs: Parâmetros adicionais para o efeito
+                - color_theme: Tema de cores ("rainbow", "pastel", "vibrant")
+                - sparkle_density: Densidade de sparkles (0.0 a 1.0)
+                - sparkle_size: Tamanho máximo dos sparkles
+                - sparkle_variation: Variação no tamanho dos sparkles
+        
+        Returns:
+            Image: Imagem com efeito de sparkle aplicado
+        """
+        # Cria uma cópia da imagem para não modificar a original
+        result = image.copy()
+        
+        # Parâmetros do efeito
+        width, height = image.size
+        sparkle_density = kwargs.get("sparkle_density", 0.05)  # Densidade padrão
+        sparkle_size_max = kwargs.get("sparkle_size", 15)  # Tamanho máximo
+        sparkle_variation = kwargs.get("sparkle_variation", 0.7)  # Variação no tamanho
+        color_theme = kwargs.get("color_theme", "rainbow")  # Tema de cores
+        
+        # Ajusta a intensidade do efeito com base no progresso
+        # Mais intenso no meio da transição
+        intensity = 1.0 - abs(2.0 * progress - 1.0)  # 0->1->0 durante a transição
+        
+        # Número de sparkles baseado na densidade e tamanho da imagem
+        num_sparkles = int(width * height * sparkle_density * intensity / 1000)
+        
+        # Define as cores dos sparkles com base no tema
+        if color_theme == "rainbow":
+            colors = [
+                (255, 0, 0, 200),      # Vermelho
+                (255, 165, 0, 200),    # Laranja
+                (255, 255, 0, 200),    # Amarelo
+                (0, 255, 0, 200),      # Verde
+                (0, 0, 255, 200),      # Azul
+                (75, 0, 130, 200),     # Índigo
+                (238, 130, 238, 200)   # Violeta
+            ]
+        elif color_theme == "pastel":
+            colors = [
+                (255, 209, 220, 200),  # Rosa pastel
+                (230, 230, 250, 200),  # Lavanda
+                (173, 216, 230, 200),  # Azul claro
+                (152, 251, 152, 200),  # Verde pastel
+                (255, 250, 205, 200),  # Amarelo claro
+                (255, 218, 185, 200),  # Pêssego
+                (221, 160, 221, 200)   # Plum
+            ]
+        else:  # "vibrant" ou padrão
+            colors = [
+                (255, 0, 0, 200),      # Vermelho
+                (255, 215, 0, 200),    # Ouro
+                (0, 255, 127, 200),    # Verde primavera
+                (0, 191, 255, 200),    # Azul céu profundo
+                (138, 43, 226, 200),   # Violeta azulado
+                (255, 20, 147, 200),   # Rosa profundo
+                (255, 255, 255, 200)   # Branco
+            ]
+        
+        # Cria um objeto de desenho
+        draw = ImageDraw.Draw(result)
+        
+        # Adiciona os sparkles
+        for _ in range(num_sparkles):
+            # Posição aleatória
+            x = random.randint(0, width - 1)
+            y = random.randint(0, height - 1)
+            
+            # Tamanho aleatório com base na variação
+            size = random.randint(
+                int(sparkle_size_max * (1 - sparkle_variation)), 
+                sparkle_size_max
+            )
+            
+            # Cor aleatória da paleta
+            color = random.choice(colors)
+            
+            # Tipo de sparkle (estrela ou círculo com gradiente)
+            sparkle_type = random.random()
+            
+            if sparkle_type < 0.6:  # 60% chance de ser uma estrela
+                # Desenha uma estrela
+                self._draw_star(draw, x, y, size, color)
+            else:  # 40% chance de ser um círculo com gradiente
+                # Desenha um círculo com gradiente
+                self._draw_gradient_circle(draw, x, y, size, color)
+        
+        return result
+    
+    def _draw_star(self, draw, x, y, size, color):
+        """Desenha uma estrela na imagem.
+        
+        Args:
+            draw: Objeto ImageDraw
+            x, y: Coordenadas do centro da estrela
+            size: Tamanho da estrela
+            color: Cor da estrela (R, G, B, A)
+        """
+        # Número de pontas da estrela
+        n_points = 5
+        
+        # Raio externo e interno
+        outer_radius = size
+        inner_radius = size // 2
+        
+        # Calcula os pontos da estrela
+        points = []
+        for i in range(n_points * 2):
+            # Alterna entre raio externo e interno
+            radius = outer_radius if i % 2 == 0 else inner_radius
+            # Calcula ângulo
+            angle = math.pi * i / n_points
+            # Adiciona ponto
+            points.append((
+                x + radius * math.sin(angle),
+                y + radius * math.cos(angle)
+            ))
+        
+        # Desenha a estrela
+        draw.polygon(points, fill=color)
+    
+    def _draw_gradient_circle(self, draw, x, y, size, color):
+        """Desenha um círculo com gradiente na imagem.
+        
+        Args:
+            draw: Objeto ImageDraw
+            x, y: Coordenadas do centro do círculo
+            size: Tamanho do círculo
+            color: Cor do círculo (R, G, B, A)
+        """
+        # Cria um círculo com gradiente
+        for r in range(size, 0, -1):
+            # Ajusta a transparência com base no raio
+            alpha = int(color[3] * (r / size))
+            # Cria a cor com nova transparência
+            circle_color = (color[0], color[1], color[2], alpha)
+            # Desenha o círculo
+            draw.ellipse((x-r, y-r, x+r, y+r), fill=circle_color)
+    
+    def _generate_page_turn_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição de página virando entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - turn_direction: Direção da virada ("left-to-right" ou "right-to-left")
+                - shadow_intensity: Intensidade da sombra (0.0 a 1.0)
+                - page_curve: Curvatura da página (0.0 a 1.0)
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        logger.info("Gerando transição de página virando")
+        
+        # Parâmetros da transição
+        turn_direction = kwargs.get("turn_direction", "left-to-right")
+        shadow_intensity = kwargs.get("shadow_intensity", 0.5)
+        page_curve = kwargs.get("page_curve", 0.3)
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Converte para arrays numpy para manipulação
+        img1_array = np.array(img1).astype(np.float32) / 255.0
+        img2_array = np.array(img2).astype(np.float32) / 255.0
+        
+        # Dimensões da imagem
+        height, width = img1_array.shape[:2]
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Aplica uma curva de aceleração para tornar a transição mais natural
+            ease_progress = 0.5 * (1 - np.cos(np.pi * progress))
+            
+            # Cria uma nova imagem para o frame atual
+            frame_array = np.zeros_like(img1_array)
+            
+            # Calcula a posição da dobra da página
+            if turn_direction == "left-to-right":
+                fold_position = int(width * ease_progress)
+                # Área visível da primeira imagem (lado esquerdo)
+                visible_width1 = fold_position
+                # Área visível da segunda imagem (lado direito)
+                visible_width2 = width - fold_position
+            else:  # "right-to-left"
+                fold_position = int(width * (1 - ease_progress))
+                # Área visível da primeira imagem (lado direito)
+                visible_width1 = width - fold_position
+                # Área visível da segunda imagem (lado esquerdo)
+                visible_width2 = fold_position
+            
+            # Cria máscaras para as áreas visíveis
+            mask1 = np.zeros((height, width))
+            mask2 = np.zeros((height, width))
+            
+            if turn_direction == "left-to-right":
+                # Primeira imagem visível à esquerda da dobra
+                mask1[:, :fold_position] = 1.0
+                # Segunda imagem visível à direita da dobra
+                mask2[:, fold_position:] = 1.0
+            else:  # "right-to-left"
+                # Primeira imagem visível à direita da dobra
+                mask1[:, fold_position:] = 1.0
+                # Segunda imagem visível à esquerda da dobra
+                mask2[:, :fold_position] = 1.0
+            
+            # Expande as máscaras para corresponder ao número de canais da imagem
+            if img1_array.shape[2] == 3:  # RGB
+                mask1 = np.stack([mask1, mask1, mask1], axis=2)
+                mask2 = np.stack([mask2, mask2, mask2], axis=2)
+            else:  # RGBA
+                mask1 = np.stack([mask1, mask1, mask1, mask1], axis=2)
+                mask2 = np.stack([mask2, mask2, mask2, mask2], axis=2)
+            
+            # Aplica as máscaras para combinar as imagens
+            frame_array = img1_array * mask1 + img2_array * mask2
+            
+            # Aplica efeito de curvatura na dobra
+            if page_curve > 0:
+                # Largura da área afetada pela curvatura
+                curve_width = int(width * page_curve * 0.2)
+                
+                # Aplica distorção na área da dobra
+                for x_offset in range(-curve_width, curve_width + 1):
+                    # Posição relativa à dobra
+                    x = fold_position + x_offset
+                    
+                    # Verifica se a posição está dentro da imagem
+                    if 0 <= x < width:
+                        # Fator de distorção baseado na distância da dobra
+                        distortion = 1.0 - abs(x_offset) / curve_width
+                        distortion = distortion * distortion * page_curve
+                        
+                        # Aplica distorção vertical
+                        for y in range(height):
+                            # Calcula o deslocamento vertical
+                            y_offset = int(distortion * np.sin(y / height * np.pi) * curve_width)
+                            
+                            # Aplica o deslocamento se estiver dentro dos limites
+                            y_src = y + y_offset
+                            if 0 <= y_src < height:
+                                frame_array[y, x] = frame_array[y_src, x]
+            
+            # Aplica sombra na área da dobra
+            if shadow_intensity > 0:
+                # Largura da sombra
+                shadow_width = int(width * 0.1)
+                
+                # Cria máscara de sombra
+                shadow_mask = np.zeros((height, width))
+                
+                # Aplica sombra gradual
+                for x_offset in range(-shadow_width, shadow_width + 1):
+                    x = fold_position + x_offset
+                    if 0 <= x < width:
+                        # Intensidade da sombra baseada na distância da dobra
+                        intensity = (1.0 - abs(x_offset) / shadow_width) * shadow_intensity
+                        shadow_mask[:, x] = intensity
+                
+                # Expande a máscara de sombra para corresponder ao número de canais
+                if img1_array.shape[2] == 3:  # RGB
+                    shadow_mask = np.stack([shadow_mask, shadow_mask, shadow_mask], axis=2)
+                else:  # RGBA
+                    shadow_mask = np.stack([shadow_mask, shadow_mask, shadow_mask, np.zeros_like(shadow_mask)], axis=2)
+                
+                # Aplica a sombra
+                frame_array = frame_array * (1.0 - shadow_mask)
+            
+            # Aplica efeito de brilho na área da dobra
+            if brightness_effect:
+                # Largura do brilho
+                brightness_width = int(width * 0.05)
+                
+                # Cria máscara de brilho
+                brightness_mask = np.zeros((height, width))
+                
+                # Aplica brilho gradual
+                for x_offset in range(-brightness_width, brightness_width + 1):
+                    x = fold_position + x_offset
+                    if 0 <= x < width:
+                        # Intensidade do brilho baseada na distância da dobra
+                        intensity = (1.0 - abs(x_offset) / brightness_width) * ease_progress
+                        brightness_mask[:, x] = intensity
+                
+                # Expande a máscara de brilho para corresponder ao número de canais
+                if img1_array.shape[2] == 3:  # RGB
+                    brightness_mask = np.stack([brightness_mask, brightness_mask, brightness_mask], axis=2)
+                else:  # RGBA
+                    brightness_mask = np.stack([brightness_mask, brightness_mask, brightness_mask, np.zeros_like(brightness_mask)], axis=2)
+                
+                # Aplica o brilho
+                frame_array = frame_array + brightness_mask * (1.0 - frame_array)
+            
+            # Converte de volta para uint8 e depois para imagem PIL
+            frame_array_uint8 = (frame_array * 255).astype(np.uint8)
+            frame = Image.fromarray(frame_array_uint8)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.03 * ease_progress,
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_rotate3d_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição de rotação 3D entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - rotation_axis: Eixo de rotação ("horizontal" ou "vertical")
+                - rotation_direction: Direção da rotação ("clockwise" ou "counterclockwise")
+                - perspective_strength: Força da perspectiva (0.0 a 1.0)
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        logger.info("Gerando transição de rotação 3D")
+        
+        # Parâmetros da transição
+        rotation_axis = kwargs.get("rotation_axis", "vertical")
+        rotation_direction = kwargs.get("rotation_direction", "clockwise")
+        perspective_strength = kwargs.get("perspective_strength", 0.5)
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Converte para arrays numpy para manipulação
+        img1_np = np.array(img1)
+        img2_np = np.array(img2)
+        
+        # Dimensões da imagem
+        height, width = img1_np.shape[:2]
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Aplica uma curva de aceleração para tornar a transição mais natural
+            ease_progress = 0.5 * (1 - np.cos(np.pi * progress))
+            
+            # Ajusta a direção da rotação
+            if rotation_direction == "counterclockwise":
+                angle = ease_progress * 180  # 0 a 180 graus
+            else:  # "clockwise"
+                angle = -ease_progress * 180  # 0 a -180 graus
+            
+            # Prepara a matriz de transformação
+            if rotation_axis == "horizontal":
+                # Rotação em torno do eixo horizontal (X)
+                # Calcula os pontos de origem e destino para a transformação de perspectiva
+                src_points = np.array([
+                    [0, 0],           # Canto superior esquerdo
+                    [width - 1, 0],   # Canto superior direito
+                    [width - 1, height - 1],  # Canto inferior direito
+                    [0, height - 1]   # Canto inferior esquerdo
+                ], dtype=np.float32)
+                
+                # Calcula a escala baseada no ângulo
+                scale_y = abs(np.cos(np.radians(angle)))
+                
+                # Calcula os pontos de destino com distorção de perspectiva
+                if angle > 0:  # Rotacionando para cima
+                    dst_points = np.array([
+                        [0, height * (1 - scale_y) / 2],
+                        [width - 1, height * (1 - scale_y) / 2],
+                        [width - 1, height - height * (1 - scale_y) / 2],
+                        [0, height - height * (1 - scale_y) / 2]
+                    ], dtype=np.float32)
+                else:  # Rotacionando para baixo
+                    dst_points = np.array([
+                        [0, height * (1 - scale_y) / 2],
+                        [width - 1, height * (1 - scale_y) / 2],
+                        [width - 1, height - height * (1 - scale_y) / 2],
+                        [0, height - height * (1 - scale_y) / 2]
+                    ], dtype=np.float32)
+            else:  # "vertical"
+                # Rotação em torno do eixo vertical (Y)
+                # Calcula os pontos de origem e destino para a transformação de perspectiva
+                src_points = np.array([
+                    [0, 0],           # Canto superior esquerdo
+                    [width - 1, 0],   # Canto superior direito
+                    [width - 1, height - 1],  # Canto inferior direito
+                    [0, height - 1]   # Canto inferior esquerdo
+                ], dtype=np.float32)
+                
+                # Calcula a escala baseada no ângulo
+                scale_x = abs(np.cos(np.radians(angle)))
+                
+                # Calcula os pontos de destino com distorção de perspectiva
+                if angle > 0:  # Rotacionando para a esquerda
+                    dst_points = np.array([
+                        [width * (1 - scale_x) / 2, 0],
+                        [width - width * (1 - scale_x) / 2, 0],
+                        [width - width * (1 - scale_x) / 2, height - 1],
+                        [width * (1 - scale_x) / 2, height - 1]
+                    ], dtype=np.float32)
+                else:  # Rotacionando para a direita
+                    dst_points = np.array([
+                        [width * (1 - scale_x) / 2, 0],
+                        [width - width * (1 - scale_x) / 2, 0],
+                        [width - width * (1 - scale_x) / 2, height - 1],
+                        [width * (1 - scale_x) / 2, height - 1]
+                    ], dtype=np.float32)
+            
+            # Ajusta a força da perspectiva
+            dst_points = src_points + (dst_points - src_points) * perspective_strength
+            
+            # Escolhe a imagem a ser exibida com base no progresso
+            if progress < 0.5:
+                # Primeira metade da transição: mostra a primeira imagem rotacionando
+                img_to_transform = img1_np.copy()
+                # Ajusta o progresso para ir de 0 a 1 durante a primeira metade
+                transform_progress = progress * 2
+            else:
+                # Segunda metade da transição: mostra a segunda imagem rotacionando de volta
+                img_to_transform = img2_np.copy()
+                # Ajusta o progresso para ir de 1 a 0 durante a segunda metade
+                transform_progress = 2 - progress * 2
+            
+            # Calcula a matriz de transformação de perspectiva
+            if progress < 0.5:
+                # Para a primeira imagem
+                transform_matrix = cv2.getPerspectiveTransform(src_points, dst_points)
+            else:
+                # Para a segunda imagem, inverte a transformação
+                transform_matrix = cv2.getPerspectiveTransform(dst_points, src_points)
+            
+            # Aplica a transformação de perspectiva
+            warped_img = cv2.warpPerspective(img_to_transform, transform_matrix, (width, height))
+            
+            # Converte para imagem PIL
+            frame = Image.fromarray(warped_img)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.5 * (1.0 - abs(2.0 * progress - 1.0))
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.03 * (1.0 - abs(2.0 * progress - 1.0)),
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_special_transition(self, img1, img2, output_dir, num_frames, transition_type, **kwargs):
+        """Gera transições especiais como bounce, spin, flip, glitch e pixelate.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            transition_type: Tipo de transição ("bounce", "spin", "flip", "glitch", "pixelate", "blur")
+            **kwargs: Parâmetros adicionais para o efeito
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+                - direction: Direção do efeito ("horizontal", "vertical", "diagonal")
+                - bounce_height: Altura do salto para o efeito bounce (0.0 a 1.0)
+                - spin_rotations: Número de rotações para o efeito spin
+                - glitch_intensity: Intensidade do efeito glitch (0.0 a 1.0)
+                - pixelate_max: Tamanho máximo dos pixels para o efeito pixelate
+                - blur_max: Intensidade máxima do desfoque para o efeito blur
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        logger.info(f"Gerando transição especial: {transition_type}")
+        
+        # Parâmetros comuns
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        direction = kwargs.get("direction", "horizontal")
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Seleciona o tipo de transição
+        if transition_type == "bounce":
+            frame_paths = self._generate_bounce_transition(img1, img2, output_dir, num_frames, **kwargs)
+        elif transition_type == "spin":
+            frame_paths = self._generate_spin_transition(img1, img2, output_dir, num_frames, **kwargs)
+        elif transition_type == "flip":
+            frame_paths = self._generate_flip_transition(img1, img2, output_dir, num_frames, **kwargs)
+        elif transition_type == "glitch":
+            frame_paths = self._generate_glitch_transition(img1, img2, output_dir, num_frames, **kwargs)
+        elif transition_type == "pixelate":
+            frame_paths = self._generate_pixelate_transition(img1, img2, output_dir, num_frames, **kwargs)
+        elif transition_type == "blur":
+            frame_paths = self._generate_blur_transition(img1, img2, output_dir, num_frames, **kwargs)
+        else:
+            logger.warning(f"Tipo de transição especial desconhecido: {transition_type}. Usando fade como fallback.")
+            # Usa uma transição de fade como fallback
+            return self._generate_fade_transition(img1, img2, output_dir, num_frames, **kwargs)
+        
+        return frame_paths
+    
+    def _generate_fade_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição de fade entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+                - is_children_content: Se True, adapta efeitos para conteúdo infantil
+                - acceleration: Tipo de aceleração ("ease-in-out", "ease-in", "ease-out")
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        logger.info("Gerando transição de fade")
+        
+        # Parâmetros do efeito
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Aplica uma curva de aceleração para tornar a transição mais natural
+            if kwargs.get("acceleration", "ease-in-out") == "ease-in-out":
+                progress = 0.5 * (1 - np.cos(np.pi * progress))
+            elif kwargs.get("acceleration", "") == "ease-in":
+                progress = progress * progress
+            elif kwargs.get("acceleration", "") == "ease-out":
+                progress = 1 - (1 - progress) * (1 - progress)
+            
+            # Mistura as imagens com base no progresso
+            frame = Image.blend(img1, img2, progress)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.3 * (1.0 - abs(2.0 * progress - 1.0))
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.02 * (1.0 - abs(2.0 * progress - 1.0)),
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_slide_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição de slide entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - direction: Direção do slide ("left", "right", "up", "down")
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+                - is_children_content: Se True, adapta efeitos para conteúdo infantil
+                - acceleration: Tipo de aceleração ("ease-in-out", "ease-in", "ease-out")
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        # Parâmetros do efeito
+        direction = kwargs.get("direction", "left")  # Direção do slide
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        logger.info(f"Gerando transição de slide na direção: {direction}")
+        
+        # Dimensões da imagem
+        width, height = img1.size
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Aplica uma curva de aceleração para tornar a transição mais natural
+            if kwargs.get("acceleration", "ease-in-out") == "ease-in-out":
+                progress = 0.5 * (1 - np.cos(np.pi * progress))
+            elif kwargs.get("acceleration", "") == "ease-in":
+                progress = progress * progress
+            elif kwargs.get("acceleration", "") == "ease-out":
+                progress = 1 - (1 - progress) * (1 - progress)
+            
+            # Cria uma nova imagem para o frame
+            frame = Image.new("RGB", (width, height))
+            
+            # Calcula as posições das imagens com base na direção
+            if direction == "left":
+                # Primeira imagem desliza para a esquerda, segunda vem da direita
+                x1 = int(-width * progress)
+                x2 = int(width * (1 - progress))
+                frame.paste(img1, (x1, 0))
+                frame.paste(img2, (x2, 0))
+            elif direction == "right":
+                # Primeira imagem desliza para a direita, segunda vem da esquerda
+                x1 = int(width * progress)
+                x2 = int(-width * (1 - progress))
+                frame.paste(img1, (x1, 0))
+                frame.paste(img2, (x2, 0))
+            elif direction == "up":
+                # Primeira imagem desliza para cima, segunda vem de baixo
+                y1 = int(-height * progress)
+                y2 = int(height * (1 - progress))
+                frame.paste(img1, (0, y1))
+                frame.paste(img2, (0, y2))
+            elif direction == "down":
+                # Primeira imagem desliza para baixo, segunda vem de cima
+                y1 = int(height * progress)
+                y2 = int(-height * (1 - progress))
+                frame.paste(img1, (0, y1))
+                frame.paste(img2, (0, y2))
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.3 * (1.0 - abs(2.0 * progress - 1.0))
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.02 * (1.0 - abs(2.0 * progress - 1.0)),
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_bounce_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição com efeito de salto (bounce) entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - bounce_height: Altura máxima do salto (0.0 a 1.0)
+                - direction: Direção do salto ("up", "down", "left", "right")
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        # Parâmetros do efeito
+        bounce_height = kwargs.get("bounce_height", 0.3)  # Altura máxima do salto
+        direction = kwargs.get("direction", "up")  # Direção do salto
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Converte para arrays numpy para manipulação
+        img1_np = np.array(img1)
+        img2_np = np.array(img2)
+        
+        # Dimensões da imagem
+        height, width = img1_np.shape[:2]
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Primeira metade: primeira imagem sai
+            # Segunda metade: segunda imagem entra
+            if progress < 0.5:
+                # Normaliza o progresso para a primeira metade (0 a 1)
+                norm_progress = progress * 2
+                
+                # Aplica uma curva para o efeito de salto (parábola)
+                # y = 4 * h * x * (1-x) onde h é a altura máxima
+                bounce_offset = 4 * bounce_height * norm_progress * (1 - norm_progress)
+                
+                # Cria uma cópia da primeira imagem para manipulação
+                frame_np = img1_np.copy()
+                
+                # Aplica a transformação de acordo com a direção
+                transform_matrix = np.eye(2, 3, dtype=np.float32)  # Matriz identidade
+                
+                if direction == "up" or direction == "down":
+                    # Movimento vertical
+                    offset_y = int(height * bounce_offset) * (-1 if direction == "up" else 1)
+                    transform_matrix[1, 2] = offset_y  # Translada verticalmente
+                else:  # "left" ou "right"
+                    # Movimento horizontal
+                    offset_x = int(width * bounce_offset) * (-1 if direction == "left" else 1)
+                    transform_matrix[0, 2] = offset_x  # Translada horizontalmente
+                
+                # Aplica a transformação
+                frame_np = cv2.warpAffine(frame_np, transform_matrix, (width, height))
+                
+                # Aplica fade-out gradual
+                alpha = 1.0 - norm_progress
+                frame_np = cv2.addWeighted(frame_np, alpha, np.zeros_like(frame_np), 0, 0)
+            else:
+                # Normaliza o progresso para a segunda metade (0 a 1)
+                norm_progress = (progress - 0.5) * 2
+                
+                # Aplica uma curva para o efeito de salto (parábola invertida)
+                # y = 4 * h * (1-x) * x onde h é a altura máxima
+                bounce_offset = 4 * bounce_height * (1 - norm_progress) * norm_progress
+                
+                # Cria uma cópia da segunda imagem para manipulação
+                frame_np = img2_np.copy()
+                
+                # Aplica a transformação de acordo com a direção
+                transform_matrix = np.eye(2, 3, dtype=np.float32)  # Matriz identidade
+                
+                if direction == "up" or direction == "down":
+                    # Movimento vertical
+                    offset_y = int(height * bounce_offset) * (1 if direction == "up" else -1)
+                    transform_matrix[1, 2] = offset_y  # Translada verticalmente
+                else:  # "left" ou "right"
+                    # Movimento horizontal
+                    offset_x = int(width * bounce_offset) * (1 if direction == "left" else -1)
+                    transform_matrix[0, 2] = offset_x  # Translada horizontalmente
+                
+                # Aplica a transformação
+                frame_np = cv2.warpAffine(frame_np, transform_matrix, (width, height))
+                
+                # Aplica fade-in gradual
+                alpha = norm_progress
+                frame_np = cv2.addWeighted(frame_np, alpha, np.zeros_like(frame_np), 0, 0)
+            
+            # Converte para imagem PIL
+            frame = Image.fromarray(frame_np)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.3 * bounce_offset
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.02 * bounce_offset,
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_spin_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição com efeito de rotação (spin) entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - spin_rotations: Número de rotações completas
+                - direction: Direção da rotação ("clockwise" ou "counterclockwise")
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        # Parâmetros do efeito
+        spin_rotations = kwargs.get("spin_rotations", 1.0)  # Número de rotações completas
+        direction = kwargs.get("direction", "clockwise")  # Direção da rotação
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Converte para arrays numpy para manipulação
+        img1_np = np.array(img1)
+        img2_np = np.array(img2)
+        
+        # Dimensões da imagem
+        height, width = img1_np.shape[:2]
+        
+        # Centro da imagem
+        center = (width // 2, height // 2)
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Calcula o ângulo de rotação
+            angle = progress * spin_rotations * 360.0
+            if direction == "counterclockwise":
+                angle = -angle
+            
+            # Primeira metade: primeira imagem roda e desaparece
+            # Segunda metade: segunda imagem aparece e roda
+            if progress < 0.5:
+                # Normaliza o progresso para a primeira metade (0 a 1)
+                norm_progress = progress * 2
+                
+                # Cria uma cópia da primeira imagem para manipulação
+                frame_np = img1_np.copy()
+                
+                # Cria a matriz de rotação
+                rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0 - norm_progress * 0.5)
+                
+                # Aplica a rotação
+                frame_np = cv2.warpAffine(frame_np, rotation_matrix, (width, height))
+                
+                # Aplica fade-out gradual
+                alpha = 1.0 - norm_progress
+                frame_np = cv2.addWeighted(frame_np, alpha, np.zeros_like(frame_np), 0, 0)
+            else:
+                # Normaliza o progresso para a segunda metade (0 a 1)
+                norm_progress = (progress - 0.5) * 2
+                
+                # Cria uma cópia da segunda imagem para manipulação
+                frame_np = img2_np.copy()
+                
+                # Calcula o ângulo para a segunda imagem
+                # Continua a partir do ângulo da primeira imagem
+                second_angle = angle - (spin_rotations * 360.0 / 2)
+                
+                # Cria a matriz de rotação
+                rotation_matrix = cv2.getRotationMatrix2D(center, second_angle, 0.5 + norm_progress * 0.5)
+                
+                # Aplica a rotação
+                frame_np = cv2.warpAffine(frame_np, rotation_matrix, (width, height))
+                
+                # Aplica fade-in gradual
+                alpha = norm_progress
+                frame_np = cv2.addWeighted(frame_np, alpha, np.zeros_like(frame_np), 0, 0)
+            
+            # Converte para imagem PIL
+            frame = Image.fromarray(frame_np)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.3 * (1.0 - abs(2.0 * progress - 1.0))
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.03 * (1.0 - abs(2.0 * progress - 1.0)),
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_flip_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição com efeito de virada (flip) entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - direction: Direção da virada ("horizontal" ou "vertical")
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        # Parâmetros do efeito
+        direction = kwargs.get("direction", "horizontal")  # Direção da virada
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Converte para arrays numpy para manipulação
+        img1_np = np.array(img1)
+        img2_np = np.array(img2)
+        
+        # Dimensões da imagem
+        height, width = img1_np.shape[:2]
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Aplica uma curva de aceleração para tornar a transição mais natural
+            ease_progress = 0.5 * (1 - np.cos(np.pi * progress))
+            
+            # Prepara a matriz de transformação
+            if direction == "horizontal":
+                # Virada horizontal
+                # Escala no eixo X vai de 1 a 0 e depois de 0 a 1
+                if progress < 0.5:
+                    # Primeira metade: primeira imagem diminui até desaparecer
+                    scale_x = 1.0 - 2.0 * progress
+                    img_to_transform = img1_np.copy()
+                else:
+                    # Segunda metade: segunda imagem aparece e cresce
+                    scale_x = 2.0 * progress - 1.0
+                    img_to_transform = img2_np.copy()
+                
+                # Cria a matriz de transformação
+                transform_matrix = np.array([
+                    [scale_x, 0, width * (1.0 - scale_x) / 2],
+                    [0, 1, 0]
+                ], dtype=np.float32)
+            else:  # "vertical"
+                # Virada vertical
+                # Escala no eixo Y vai de 1 a 0 e depois de 0 a 1
+                if progress < 0.5:
+                    # Primeira metade: primeira imagem diminui até desaparecer
+                    scale_y = 1.0 - 2.0 * progress
+                    img_to_transform = img1_np.copy()
+                else:
+                    # Segunda metade: segunda imagem aparece e cresce
+                    scale_y = 2.0 * progress - 1.0
+                    img_to_transform = img2_np.copy()
+                
+                # Cria a matriz de transformação
+                transform_matrix = np.array([
+                    [1, 0, 0],
+                    [0, scale_y, height * (1.0 - scale_y) / 2]
+                ], dtype=np.float32)
+            
+            # Aplica a transformação
+            frame_np = cv2.warpAffine(img_to_transform, transform_matrix, (width, height))
+            
+            # Converte para imagem PIL
+            frame = Image.fromarray(frame_np)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.3 * (1.0 - abs(2.0 * progress - 1.0))
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.03 * (1.0 - abs(2.0 * progress - 1.0)),
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_glitch_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição com efeito de glitch entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - glitch_intensity: Intensidade do efeito glitch (0.0 a 1.0)
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        # Parâmetros do efeito
+        glitch_intensity = kwargs.get("glitch_intensity", 0.5)  # Intensidade do glitch
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Converte para arrays numpy para manipulação
+        img1_np = np.array(img1)
+        img2_np = np.array(img2)
+        
+        # Dimensões da imagem
+        height, width = img1_np.shape[:2]
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Intensidade do glitch varia durante a transição
+            # Máxima no meio da transição
+            current_intensity = glitch_intensity * (1.0 - abs(2.0 * progress - 1.0))
+            
+            # Mistura as imagens com base no progresso
+            alpha = progress
+            frame_np = cv2.addWeighted(img1_np, 1.0 - alpha, img2_np, alpha, 0)
+            
+            # Aplica o efeito de glitch
+            if current_intensity > 0:
+                # Número de distorções baseado na intensidade
+                num_glitches = int(10 * current_intensity)
+                
+                # Aplica várias distorções aleatórias
+                for _ in range(num_glitches):
+                    # Seleciona um canal de cor aleatório para distorcer
+                    channel = random.randint(0, 2)  # R, G ou B
+                    
+                    # Seleciona uma linha aleatória para distorcer
+                    y = random.randint(0, height - 1)
+                    
+                    # Altura da faixa de distorção
+                    glitch_height = random.randint(1, int(10 * current_intensity))
+                    
+                    # Limita a altura para não ultrapassar a imagem
+                    if y + glitch_height >= height:
+                        glitch_height = height - y - 1
+                    
+                    # Deslocamento horizontal aleatório
+                    shift = random.randint(-int(width * current_intensity / 3), 
+                                          int(width * current_intensity / 3))
+                    
+                    # Aplica o deslocamento
+                    if shift > 0:
+                        # Desloca para a direita
+                        frame_np[y:y+glitch_height, shift:, channel] = \
+                            frame_np[y:y+glitch_height, :-shift, channel]
+                    elif shift < 0:
+                        # Desloca para a esquerda
+                        frame_np[y:y+glitch_height, :shift, channel] = \
+                            frame_np[y:y+glitch_height, -shift:, channel]
+                
+                # Adiciona ruído aleatório
+                noise = np.random.normal(0, 20 * current_intensity, frame_np.shape).astype(np.int8)
+                frame_np = np.clip(frame_np.astype(np.int16) + noise, 0, 255).astype(np.uint8)
+            
+            # Converte para imagem PIL
+            frame = Image.fromarray(frame_np)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.2 * current_intensity
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.02 * current_intensity,
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_pixelate_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição com efeito de pixelização entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - pixelate_max: Tamanho máximo dos pixels (maior = mais pixelizado)
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        # Parâmetros do efeito
+        pixelate_max = kwargs.get("pixelate_max", 30)  # Tamanho máximo dos pixels
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Dimensões da imagem
+        width, height = img1.size
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Curva de pixelização: aumenta até o meio, depois diminui
+            if progress < 0.5:
+                # Primeira metade: aumenta a pixelização
+                pixelate_size = int(pixelate_max * (progress * 2))
+                # Usa a primeira imagem
+                img_to_pixelate = img1
+            else:
+                # Segunda metade: diminui a pixelização
+                pixelate_size = int(pixelate_max * (2 - progress * 2))
+                # Usa a segunda imagem
+                img_to_pixelate = img2
+            
+            # Garante que o tamanho mínimo é 1
+            pixelate_size = max(1, pixelate_size)
+            
+            # Aplica o efeito de pixelização
+            # Redimensiona para baixo e depois para cima para criar o efeito
+            small = img_to_pixelate.resize(
+                (width // pixelate_size, height // pixelate_size),
+                resample=Image.BILINEAR
+            )
+            frame = small.resize((width, height), resample=Image.NEAREST)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.3 * (1.0 - abs(2.0 * progress - 1.0))
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.02 * (1.0 - abs(2.0 * progress - 1.0)),
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _generate_blur_transition(self, img1, img2, output_dir, num_frames, **kwargs):
+        """Gera uma transição com efeito de desfoque entre duas imagens.
+        
+        Args:
+            img1: Imagem PIL da primeira cena
+            img2: Imagem PIL da segunda cena
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            **kwargs: Parâmetros adicionais para o efeito
+                - blur_max: Raio máximo do desfoque
+                - sparkle_effect: Se True, adiciona sparkles à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+        
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        # Parâmetros do efeito
+        blur_max = kwargs.get("blur_max", 20)  # Raio máximo do desfoque
+        sparkle_effect = kwargs.get("sparkle_effect", False)
+        brightness_effect = kwargs.get("brightness_effect", False)
+        is_children_content = kwargs.get("is_children_content", False)
+        
+        # Lista para armazenar os caminhos dos frames
+        frame_paths = []
+        
+        # Gera os frames da transição
+        for i in range(num_frames):
+            # Calcula o progresso da transição
+            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+            
+            # Curva de desfoque: aumenta até o meio, depois diminui
+            if progress < 0.5:
+                # Primeira metade: aumenta o desfoque na primeira imagem
+                blur_radius = int(blur_max * (progress * 2))
+                # Usa a primeira imagem
+                img_to_blur = img1.copy()
+                # Aplica o desfoque
+                frame = img_to_blur.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+                # Mistura com a imagem original para um efeito mais suave
+                alpha = progress * 2
+                frame = Image.blend(img_to_blur, frame, alpha)
+            else:
+                # Segunda metade: diminui o desfoque na segunda imagem
+                blur_radius = int(blur_max * (2 - progress * 2))
+                # Usa a segunda imagem
+                img_to_blur = img2.copy()
+                # Aplica o desfoque
+                blurred = img_to_blur.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+                # Mistura com a imagem original para um efeito mais suave
+                alpha = 2 - progress * 2
+                frame = Image.blend(img_to_blur, blurred, alpha)
+            
+            # Aplica efeito de brilho se solicitado
+            if brightness_effect:
+                # Cria um enhancer de brilho
+                enhancer = ImageEnhance.Brightness(frame)
+                # Calcula o fator de brilho (mais brilhante no meio da transição)
+                brightness_factor = 1.0 + 0.3 * (1.0 - abs(2.0 * progress - 1.0))
+                # Aplica o brilho
+                frame = enhancer.enhance(brightness_factor)
+            
+            # Aplica efeito de sparkle se solicitado
+            if sparkle_effect:
+                frame = self._add_sparkle_effect(
+                    frame, 
+                    progress,
+                    sparkle_density=0.02 * (1.0 - abs(2.0 * progress - 1.0)),
+                    color_theme="rainbow" if is_children_content else "vibrant",
+                    **kwargs
+                )
+            
+            # Salva o frame
+            frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+            frame.save(frame_path)
+            frame_paths.append(frame_path)
+        
+        return frame_paths
+    
+    def _stability_generate_morph_frames(self, source_image1, source_image2, output_dir, num_frames, quality, seed=None, **kwargs):
+        """Gera frames de morphing usando a API da Stability AI.
+        
+        Args:
+            source_image1: Caminho para a primeira imagem
+            source_image2: Caminho para a segunda imagem
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            quality: Qualidade do morphing
+            seed: Seed para consistência
+            
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        try:
+            # Configuração da API da Stability
+            api_host = kwargs.get('api_host', 'https://api.stability.ai')
+            api_endpoint = f"{api_host}/v1/generation/image-to-image/morph"
+            
+            # Prepara as imagens para envio
+            with open(source_image1, "rb") as f1, open(source_image2, "rb") as f2:
+                source_image1_data = base64.b64encode(f1.read()).decode('utf-8')
+                source_image2_data = base64.b64encode(f2.read()).decode('utf-8')
+            
+            # Mapeia a qualidade para os parâmetros da API
+            quality_map = {
+                "low": {"steps": 15, "cfg_scale": 7.0},
+                "medium": {"steps": 30, "cfg_scale": 7.5},
+                "high": {"steps": 50, "cfg_scale": 8.0}
+            }
+            
+            api_params = quality_map.get(quality, quality_map["medium"])
+            
+            # Adiciona parâmetros adicionais
+            if seed is not None:
+                api_params["seed"] = seed
+            
+            # Prepara o payload da requisição
+            payload = {
+                "source_image_1": source_image1_data,
+                "source_image_2": source_image2_data,
+                "num_frames": num_frames,
+                **api_params,
+                **kwargs
+            }
+            
+            # Cabeçalhos da requisição
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": f"Bearer {self.api_key}"
+            }
+            
+            # Faz a requisição à API
+            logger.info(f"Enviando requisição para a API da Stability AI")
+            response = requests.post(api_endpoint, headers=headers, json=payload)
+            
+            # Verifica se a requisição foi bem-sucedida
+            if response.status_code == 200:
+                # Processa a resposta
+                result = response.json()
+                frame_paths = []
+                
+                # Salva os frames recebidos
+                for i, frame_data in enumerate(result.get("frames", [])):
+                    # Decodifica a imagem de base64
+                    image_data = base64.b64decode(frame_data)
+                    frame = Image.open(BytesIO(image_data))
+                    
+                    # Salva o frame
+                    frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+                    frame.save(frame_path)
+                    frame_paths.append(frame_path)
+                
+                return frame_paths
+            else:
+                logger.error(f"Erro na API da Stability: {response.status_code} - {response.text}")
+                # Fallback para interpolação simples
+                return []
+                
+        except Exception as e:
+            logger.error(f"Erro ao usar API da Stability para morphing: {str(e)}")
+            return []
+    def generate_scene_transition(self, scene1_image, scene2_image, output_path, 
+                                  transition_type="fade", duration=1.5, fps=24, **kwargs):
+        """Gera uma transição entre duas cenas.
+        
+        Args:
+            scene1_image: Caminho para a imagem da primeira cena
+            scene2_image: Caminho para a imagem da segunda cena
+            output_path: Caminho para salvar a transição gerada
+            transition_type: Tipo de transição (fade, dissolve, wipe, etc.)
+            duration: Duração da transição em segundos
+            fps: Frames por segundo
+            **kwargs: Parâmetros adicionais para a API
+                - is_children_content: Se True, aplica efeitos especiais para conteúdo infantil
+                - sparkle_effect: Se True, adiciona efeito de brilhos/estrelas à transição
+                - brightness_effect: Se True, adiciona efeito de brilho à transição
+                - color_theme: Tema de cores para os efeitos ("rainbow", "pastel", "vibrant")
+                - character_focus: Nome do personagem em foco para efeitos personalizados
+            
+        Returns:
+            bool: True se a transição foi gerada com sucesso, False caso contrário
+        """
+        logger.info(f"Gerando transição entre cenas: {transition_type}")
+        
+        # Verifica se as imagens de origem existem
+        if not os.path.exists(scene1_image) or not os.path.exists(scene2_image):
+            logger.error(f"Imagens de origem não encontradas: {scene1_image} ou {scene2_image}")
+            return False
+        
+        # Cria o diretório de saída se não existir
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        # Verifica se a transição já existe no cache
+        if self.cache_enabled:
+            cache_key = self._get_cache_key([scene1_image, scene2_image], f"transition_{transition_type}", kwargs)
+            if cache_key in self.animation_cache:
+                cached_path = self.animation_cache[cache_key]
+                if os.path.exists(cached_path):
+                    logger.info(f"Usando transição em cache: {cached_path}")
+                    # Copia a transição em cache para o caminho de saída
+                    shutil.copy2(cached_path, output_path)
+                    return True
+        
+        # Tipos de transição avançada que requerem processamento especial
+        advanced_transitions = [
+            "wipe_right", "wipe_left", "wipe_up", "wipe_down", 
+            "zoom", "morph", "rotate3d", "page_turn", "dissolve", 
+            "slide_right", "slide_left", "slide_up", "slide_down",
+            "bounce", "spin", "flip", "glitch", "pixelate", "blur"
+        ]
+        
+        # Se for um tipo avançado, usa processamento especial
+        if transition_type.lower() in advanced_transitions:
+            try:
+                # Carrega as imagens de origem
+                img1 = Image.open(scene1_image).convert('RGBA')
+                img2 = Image.open(scene2_image).convert('RGBA')
+                
+                # Garante que ambas as imagens tenham o mesmo tamanho
+                if img1.size != img2.size:
+                    # Redimensiona a segunda imagem para corresponder à primeira
+                    img2 = img2.resize(img1.size, Image.LANCZOS)
+                
+                # Cria um diretório temporário para os frames
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    # Calcula o número total de frames
+                    num_frames = int(duration * fps)
+                    
+                    # Gera os frames da transição com base no tipo selecionado
+                    if transition_type.lower() == "wipe_right":
+                        # Transição de wipe da esquerda para a direita
+                        width, height = img1.size
+                        for i in range(num_frames):
+                            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+                            # Calcula a posição do corte
+                            cut_pos = int(width * progress)
+                            
+                            # Cria uma nova imagem
+                            frame = Image.new('RGBA', img1.size)
+                            # Cola a parte da primeira imagem
+                            frame.paste(img1.crop((0, 0, cut_pos, height)), (0, 0))
+                            # Cola a parte da segunda imagem
+                            frame.paste(img2.crop((cut_pos, 0, width, height)), (cut_pos, 0))
+                            
+                            frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                            frame.save(frame_path)
+                    
+                    elif transition_type.lower() == "wipe_left":
+                        # Transição de wipe da direita para a esquerda
+                        width, height = img1.size
+                        for i in range(num_frames):
+                            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+                            # Calcula a posição do corte
+                            cut_pos = int(width * (1 - progress))
+                            
+                            # Cria uma nova imagem
+                            frame = Image.new('RGBA', img1.size)
+                            # Cola a parte da primeira imagem
+                            frame.paste(img1.crop((cut_pos, 0, width, height)), (cut_pos, 0))
+                            # Cola a parte da segunda imagem
+                            frame.paste(img2.crop((0, 0, cut_pos, height)), (0, 0))
+                            
+                            frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                            frame.save(frame_path)
+                    
+                    elif transition_type.lower() == "wipe_up":
+                        # Transição de wipe de baixo para cima
+                        width, height = img1.size
+                        for i in range(num_frames):
+                            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+                            # Calcula a posição do corte
+                            cut_pos = int(height * (1 - progress))
+                            
+                            # Cria uma nova imagem
+                            frame = Image.new('RGBA', img1.size)
+                            # Cola a parte da primeira imagem
+                            frame.paste(img1.crop((0, cut_pos, width, height)), (0, cut_pos))
+                            # Cola a parte da segunda imagem
+                            frame.paste(img2.crop((0, 0, width, cut_pos)), (0, 0))
+                            
+                            frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                            frame.save(frame_path)
+                    
+                    elif transition_type.lower() == "wipe_down":
+                        # Transição de wipe de cima para baixo
+                        width, height = img1.size
+                        for i in range(num_frames):
+                            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+                            # Calcula a posição do corte
+                            cut_pos = int(height * progress)
+                            
+                            # Cria uma nova imagem
+                            frame = Image.new('RGBA', img1.size)
+                            # Cola a parte da primeira imagem
+                            frame.paste(img1.crop((0, 0, width, cut_pos)), (0, 0))
+                            # Cola a parte da segunda imagem
+                            frame.paste(img2.crop((0, cut_pos, width, height)), (0, cut_pos))
+                            
+                            frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                            frame.save(frame_path)
+                    
+                    elif transition_type.lower() == "zoom":
+                        # Transição de zoom out da primeira imagem e zoom in na segunda
+                        width, height = img1.size
+                        for i in range(num_frames):
+                            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+                            
+                            if progress < 0.5:
+                                # Primeira metade: zoom out da primeira imagem
+                                zoom_progress = 1.0 - (progress * 2)  # 1.0 -> 0.0
+                                zoom_size = (int(width * zoom_progress), int(height * zoom_progress))
+                                
+                                # Redimensiona a imagem
+                                zoomed = img1.resize(zoom_size, Image.LANCZOS)
+                                
+                                # Cria uma nova imagem e centraliza a imagem redimensionada
+                                frame = Image.new('RGBA', img1.size, (0, 0, 0, 255))
+                                paste_x = (width - zoom_size[0]) // 2
+                                paste_y = (height - zoom_size[1]) // 2
+                                frame.paste(zoomed, (paste_x, paste_y))
+                            else:
+                                # Segunda metade: zoom in da segunda imagem
+                                zoom_progress = (progress - 0.5) * 2  # 0.0 -> 1.0
+                                zoom_size = (int(width * zoom_progress), int(height * zoom_progress))
+                                
+                                # Redimensiona a imagem
+                                zoomed = img2.resize(zoom_size, Image.LANCZOS)
+                                
+                                # Cria uma nova imagem e centraliza a imagem redimensionada
+                                frame = Image.new('RGBA', img1.size, (0, 0, 0, 255))
+                                paste_x = (width - zoom_size[0]) // 2
+                                paste_y = (height - zoom_size[1]) // 2
+                                frame.paste(zoomed, (paste_x, paste_y))
+                            
+                            frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                            frame.save(frame_path)
+                    
+                    elif transition_type.lower() == "morph":
+                        # Verifica se temos acesso à API para morphing de alta qualidade
+                        if self.api_key and kwargs.get("use_api", True):
+                            # Em uma implementação real, aqui chamaria a API
+                            # Por enquanto, vamos usar o método de morphing local avançado
+                            morph_frames = self.generate_morph_frames(
+                                scene1_image, 
+                                scene2_image, 
+                                num_frames=num_frames, 
+                                quality=kwargs.get("morph_quality", "high"),
+                                seed=kwargs.get("seed", None),
+                                **kwargs
+                            )
+                            
+                            # Se temos frames gerados, vamos usá-los
+                            if morph_frames:
+                                for i, frame_path in enumerate(morph_frames):
+                                    dest_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                                    shutil.copy2(frame_path, dest_path)
+                        
+                        # Fallback: Morphing local básico
+                        for i in range(num_frames):
+                            progress = i / (num_frames - 1) if num_frames > 1 else 1.0
+                            
+                            # Aplica uma curva de aceleração para tornar o morphing mais natural
+                            if kwargs.get("acceleration", "ease-in-out") == "ease-in-out":
+                                progress = 0.5 * (1 - np.cos(np.pi * progress))
+                            elif kwargs.get("acceleration", "") == "ease-in":
+                                progress = progress * progress
+                            elif kwargs.get("acceleration", "") == "ease-out":
+                                progress = 1 - (1 - progress) * (1 - progress)
+                            
+                            # Blend entre as imagens
+                            frame = Image.blend(img1, img2, progress)
+                            
+                            # Adiciona alguma distorção para simular morphing
+                            if 0.25 < progress < 0.75:
+                                # Converte para array numpy para manipulação
+                                frame_array = np.array(frame)
+                                
+                                # Aplica uma distorção mais sofisticada
+                                distortion = np.sin(progress * np.pi) * 0.1
+                                rows, cols = frame_array.shape[:2]
+                                
+                                # Cria uma grade de distorção
+                                x = np.arange(cols)
+                                y = np.arange(rows)
+                                x_grid, y_grid = np.meshgrid(x, y)
+                                
+                                # Aplica distorção baseada em seno
+                                if kwargs.get("morph_quality", "medium") == "high":
+                                    x_offset = distortion * np.sin(y_grid / rows * np.pi) * 20
+                                    y_offset = distortion * np.sin(x_grid / cols * np.pi) * 20
+                                    
+                                    # Aplica distorção mais complexa
+                                    for c in range(min(3, frame_array.shape[2])):
+                                        frame_array[:,:,c] = np.roll(frame_array[:,:,c], int(distortion * 10), axis=1)
+                                else:
+                                    # Distorção simples
+                                    frame_array = np.roll(frame_array, int(distortion * 10), axis=1)
+                                
+                                # Adiciona efeito de cor para conteúdo infantil
+                                if kwargs.get("is_children_content", False) and kwargs.get("color_shift", False):
+                                    # Ajusta as cores para tornar mais vibrante
+                                    hsv = cv2.cvtColor(frame_array, cv2.COLOR_RGB2HSV).astype(np.float32)
+                                    # Aumenta a saturação
+                                    hsv[:,:,1] = hsv[:,:,1] * (1.0 + 0.3 * np.sin(progress * np.pi))
+                                    # Ajusta o matiz sutilmente
+                                    hsv[:,:,0] = (hsv[:,:,0] + 10 * np.sin(progress * np.pi)) % 180
+                                    # Converte de volta para RGB
+                                    frame_array = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2RGB)
+                                
+                                # Converte de volta para imagem
+                                frame = Image.fromarray(frame_array)
+                            
+                            # Adiciona efeitos especiais para conteúdo infantil
+                            if kwargs.get("is_children_content", False) and kwargs.get("sparkle_effect", False):
+                                # Adiciona sparkles/estrelas
+                                frame = self._add_sparkle_effect(frame, progress, **kwargs)
+                            
+                            frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                            frame.save(frame_path)
+                    
+                    # Usa FFmpeg para combinar os frames em um vídeo
+                    frames_pattern = os.path.join(temp_dir, "frame_%04d.png")
+                    import subprocess
+                    ffmpeg_cmd = [
+                        'ffmpeg', '-y',
+                        '-r', str(fps),
+                        '-i', frames_pattern,
+                        '-c:v', 'libx264',
+                        '-pix_fmt', 'yuv420p',
+                        '-crf', '23',
+                        output_path
+                    ]
+                    
+                    subprocess.run(ffmpeg_cmd, check=True, capture_output=True)
+                    
+                    if os.path.exists(output_path):
+                        logger.info(f"Transição avançada gerada com sucesso: {output_path}")
+                        
+                        # Salva metadados da transição
+                        transition_info = {
+                            "type": transition_type,
+                            "duration": duration,
+                            "fps": fps,
+                            "source_images": [scene1_image, scene2_image],
+                            "created_at": time.time(),
+                            "parameters": kwargs
+                        }
+                        
+                        # Atualiza o cache
+                        if self.cache_enabled:
+                            cache_key = self._get_cache_key([scene1_image, scene2_image], 
+                                                          f"transition_{transition_type}", kwargs)
+                            cache_path = os.path.join(self.cache_dir, f"transition_{hash(cache_key)}.mp4")
+                            shutil.copy2(output_path, cache_path)
+                            
+                            self.animation_cache[cache_key] = cache_path
+                            self.animation_metadata[cache_key] = transition_info
+                            self._save_cache()
+                        
+                        return True
+                    else:
+                        logger.error(f"Falha ao gerar transição avançada: {output_path}")
+                        return False
+                    
+            except Exception as e:
+                logger.error(f"Erro ao gerar transição avançada: {str(e)}")
+                logger.warning("Tentando gerar transição simples como fallback...")
+                # Continua para o método padrão abaixo
+        
+        # Implementa transições adicionais
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Carrega as imagens
+                img1 = Image.open(scene1_image).convert('RGBA')
+                img2 = Image.open(scene2_image).convert('RGBA')
+                
+                # Garante que ambas as imagens tenham o mesmo tamanho
+                if img1.size != img2.size:
+                    img2 = img2.resize(img1.size, Image.LANCZOS)
+                
+                # Número de frames
+                num_frames = int(duration * fps)
+                frame_paths = []
+                
+                # Implementa transições específicas para conteúdo infantil
+                if transition_type.lower() == "page_turn":
+                    # Implementa transição de página virando
+                    frame_paths = self._generate_page_turn_transition(
+                        img1, img2, temp_dir, num_frames, 
+                        turn_direction=kwargs.get("turn_direction", "left-to-right"),
+                        shadow_intensity=kwargs.get("shadow_intensity", 0.5),
+                        page_curve=kwargs.get("page_curve", 0.3),
+                        sparkle_effect=kwargs.get("sparkle_effect", False),
+                        brightness_effect=kwargs.get("brightness_effect", False),
+                        is_children_content=kwargs.get("is_children_content", False),
+                        **kwargs
+                    )
+                elif transition_type.lower() == "rotate3d":
+                    # Implementa transição de rotação 3D
+                    frame_paths = self._generate_rotate3d_transition(
+                        img1, img2, temp_dir, num_frames,
+                        rotation_angle=kwargs.get("rotation_angle", 180),
+                        rotation_axis=kwargs.get("rotation_axis", "y"),
+                        perspective=kwargs.get("perspective", 0.0008),
+                        **kwargs
+                    )
+                elif transition_type.lower() in ["bounce", "spin", "flip", "glitch", "pixelate", "blur"]:
+                    # Implementa transições especiais para conteúdo infantil
+                    frame_paths = self._generate_special_transition(
+                        img1, img2, temp_dir, num_frames, transition_type.lower(), **kwargs
+                    )
+                elif transition_type.lower() == "fade" or transition_type.lower() == "dissolve":
+                    # Implementa transição de fade/dissolve
+                    frame_paths = self._generate_fade_transition(
+                        img1, img2, temp_dir, num_frames,
+                        sparkle_effect=kwargs.get("sparkle_effect", False),
+                        brightness_effect=kwargs.get("brightness_effect", False),
+                        is_children_content=kwargs.get("is_children_content", False),
+                        **kwargs
+                    )
+                elif transition_type.lower().startswith("slide"):
+                    # Extrai a direção do tipo de transição (slide_right, slide_left, etc.)
+                    direction = transition_type.lower().split("_")[1] if "_" in transition_type.lower() else kwargs.get("direction", "left")
+                    
+                    # Implementa transição de slide
+                    frame_paths = self._generate_slide_transition(
+                        img1, img2, temp_dir, num_frames,
+                        direction=direction,
+                        sparkle_effect=kwargs.get("sparkle_effect", False),
+                        brightness_effect=kwargs.get("brightness_effect", False),
+                        is_children_content=kwargs.get("is_children_content", False),
+                        **kwargs
+                    )
+                
+                # Se temos frames gerados, combina-os em um vídeo
+                if frame_paths:
+                    # Usa FFmpeg para combinar os frames em um vídeo
+                    frames_pattern = os.path.join(temp_dir, "frame_%04d.png")
+                    import subprocess
+                    ffmpeg_cmd = [
+                        'ffmpeg', '-y',
+                        '-r', str(fps),
+                        '-i', frames_pattern,
+                        '-c:v', 'libx264',
+                        '-pix_fmt', 'yuv420p',
+                        '-crf', '23',
+                        output_path
+                    ]
+                    
+                    subprocess.run(ffmpeg_cmd, check=True, capture_output=True)
+                    
+                    if os.path.exists(output_path):
+                        logger.info(f"Transição {transition_type} gerada com sucesso: {output_path}")
+                        
+                        # Salva no cache
+                        if self.cache_enabled:
+                            cache_key = self._get_cache_key([scene1_image, scene2_image], 
+                                                          f"transition_{transition_type}", kwargs)
+                            cache_path = os.path.join(self.cache_dir, f"transition_{hash(cache_key)}.mp4")
+                            shutil.copy2(output_path, cache_path)
+                            
+                            self.animation_cache[cache_key] = cache_path
+                            self.animation_metadata[cache_key] = {
+                                "type": transition_type,
+                                "duration": duration,
+                                "fps": fps,
+                                "source_images": [scene1_image, scene2_image],
+                                "created_at": time.time(),
+                                "parameters": kwargs
+                            }
+                            self._save_cache()
+                        
+                        return True
+        except Exception as e:
+            logger.error(f"Erro ao gerar transição {transition_type}: {str(e)}")
+            logger.warning("Tentando método padrão como fallback...")
+        
+        # Método padrão: usa a API para gerar a transição
+        return self.generate_animation(
+            [scene1_image, scene2_image], 
+            output_path, 
+            animation_type=transition_type, 
+            duration=duration, 
+            fps=fps, 
+            **kwargs
+        )
+    
+    def generate_character_animation(self, character_image, output_path, 
+                                    animation_type="talk", duration=2.0, fps=24, **kwargs):
+        """Gera uma animação para um personagem (ex: falar, piscar, etc.).
+        
+        Args:
+            character_image: Caminho para a imagem do personagem
+            output_path: Caminho para salvar a animação gerada
+            animation_type: Tipo de animação (talk, blink, move, etc.)
+            duration: Duração da animação em segundos
+            fps: Frames por segundo
+            **kwargs: Parâmetros adicionais para a API
+            
+        Returns:
+            bool: True se a animação foi gerada com sucesso, False caso contrário
+        """
+        logger.info(f"Gerando animação de personagem: {animation_type}")
+        
+        # Para animações de personagem, usamos técnicas específicas
+        # Em uma implementação real, isso seria integrado com uma API especializada
+        
+        # Por enquanto, vamos usar uma abordagem simplificada
+        return self.generate_animation(
+            [character_image], 
+            output_path, 
+            animation_type=animation_type, 
+            duration=duration, 
+            fps=fps, 
+            **kwargs
+        )
+    
+    def animate_story_scene(self, scene_images, character_images, background_image, 
+                           output_path, duration=5.0, fps=24, **kwargs):
+        """Cria uma animação completa para uma cena de história.
+        
+        Args:
+            scene_images: Lista de imagens da cena
+            character_images: Dicionário com imagens dos personagens
+            background_image: Imagem de fundo
+            output_path: Caminho para salvar a animação gerada
+            duration: Duração da animação em segundos
+            fps: Frames por segundo
+            **kwargs: Parâmetros adicionais
+            
+        Returns:
+            bool: True se a animação foi gerada com sucesso, False caso contrário
+        """
+        logger.info(f"Gerando animação completa para cena de história")
+        
+        # Em uma implementação real, isso combinaria várias técnicas de animação
+        # para criar uma cena completa com personagens animados sobre um fundo
+        
+        # Por enquanto, vamos usar uma abordagem simplificada
+        all_images = [background_image] + list(scene_images)
+        return self.generate_animation(
+            all_images, 
+            output_path, 
+            animation_type="scene", 
+            duration=duration, 
+            fps=fps, 
+            **kwargs
+        )
+    
+    def test_animation_generation(self, test_images, output_dir):
+        """Testa a geração de animações com diferentes configurações.
+        
+        Args:
+            test_images: Lista de imagens para teste
+            output_dir: Diretório para salvar as animações de teste
+            
+        Returns:
+            Dict: Resultados do teste com caminhos para as animações geradas
+        """
+        logger.info("Iniciando teste de geração de animações")
+        
+        os.makedirs(output_dir, exist_ok=True)
+        results = {
+            "morph_animations": [],
+            "zoom_animations": [],
+            "character_animations": []
+        }
+        
+        # Testa animação de morphing entre imagens
+        if len(test_images) >= 2:
+            morph_output = os.path.join(output_dir, "morph_test.mp4")
+            success = self.generate_animation(
+                test_images[:2],
+                morph_output,
+                animation_type="morph",
+                duration=3.0,
+                fps=24,
+                force_regenerate=True
+            )
+            if success:
+                results["morph_animations"].append(morph_output)
+        
+        # Testa animação de zoom
+        if test_images:
+            zoom_output = os.path.join(output_dir, "zoom_test.mp4")
+            success = self.generate_animation(
+                [test_images[0]],
+                zoom_output,
+                animation_type="zoom",
+                duration=2.0,
+                fps=24,
+                force_regenerate=True
+            )
+            if success:
+                results["zoom_animations"].append(zoom_output)
+        
+        # Testa animação de personagem
+        if test_images:
+            character_output = os.path.join(output_dir, "character_test.mp4")
+            success = self.generate_character_animation(
+                test_images[0],
+                character_output,
+                animation_type="talk",
+                duration=2.5,
+                fps=24,
+                force_regenerate=True
+            )
+            if success:
+                results["character_animations"].append(character_output)
+        
+        logger.info(f"Teste de animação concluído. Resultados: {results}")
+        return results
+
+# Exemplo de uso
+if __name__ == "__main__":
+    # Configurações de teste
+    test_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'data', 'test'
+    )
+    os.makedirs(test_dir, exist_ok=True)
+    
+    # Cria o agente de animação
+    agent = AnimationGeneratorAgent(api_provider="stability")
+    
+    # Encontra imagens para teste
+    import glob
+    test_images = glob.glob(os.path.join(test_dir, "*.png"))
+    
+    if not test_images:
+        print("Nenhuma imagem de teste encontrada. Criando imagens de placeholder...")
+        
+        # Cria imagens de placeholder para teste
+        from PIL import Image, ImageDraw, ImageFont
+        
+        for i in range(3):
+            img = Image.new('RGB', (512, 512), color=(240, 240, 240))
+            draw = ImageDraw.Draw(img)
+            
+            try:
+                font = ImageFont.truetype("Arial", 24)
+            except IOError:
+                font = ImageFont.load_default()
+            
+            text = f"Imagem de Teste {i+1}"
+            text_width = draw.textlength(text, font=font)
+            draw.text(
+                ((512 - text_width) // 2, 256),
+                text,
+                font=font,
+                fill=(0, 0, 0)
+            )
+            
+            img_path = os.path.join(test_dir, f"test_image_{i+1}.png")
+            img.save(img_path)
+            test_images.append(img_path)
+        
+        print(f"Criadas {len(test_images)} imagens de teste")
+    
+    # Testa a geração de animações
+    output_dir = os.path.join(test_dir, "animations")
+    results = agent.test_animation_generation(test_images, output_dir)
+    
+    print("\n=== Resultados do Teste de Animação ===")
+    for anim_type, paths in results.items():
+        print(f"{anim_type}: {len(paths)} animações geradas")
+        for path in paths:
+            print(f"  - {path}")
+        
+    def _stability_generate_morph_frames(self, source_image1, source_image2, output_dir, num_frames, quality, seed=None, **kwargs):
+        """Gera frames de morphing usando a API da Stability AI.
+        
+        Args:
+            source_image1: Caminho para a primeira imagem
+            source_image2: Caminho para a segunda imagem
+            output_dir: Diretório para salvar os frames
+            num_frames: Número de frames a gerar
+            quality: Qualidade do morphing
+            seed: Seed para consistência
+            
+        Returns:
+            List[str]: Lista de caminhos para os frames gerados
+        """
+        try:
+            # Configuração da API da Stability
+            api_host = kwargs.get('api_host', 'https://api.stability.ai')
+            api_endpoint = f"{api_host}/v1/generation/image-to-image/morph"
+            
+            # Prepara as imagens para envio
+            with open(source_image1, "rb") as f1, open(source_image2, "rb") as f2:
+                source_image1_data = base64.b64encode(f1.read()).decode('utf-8')
+                source_image2_data = base64.b64encode(f2.read()).decode('utf-8')
+            
+            # Mapeia a qualidade para os parâmetros da API
+            quality_map = {
+                "low": {"steps": 15, "cfg_scale": 7.0},
+                "medium": {"steps": 30, "cfg_scale": 7.5},
+                "high": {"steps": 50, "cfg_scale": 8.0}
+            }
+            
+            api_params = quality_map.get(quality, quality_map["medium"])
+            
+            # Adiciona parâmetros adicionais
+            if seed is not None:
+                api_params["seed"] = seed
+            
+            # Prepara o payload da requisição
+            payload = {
+                "source_image_1": source_image1_data,
+                "source_image_2": source_image2_data,
+                "num_frames": num_frames,
+                **api_params,
+                **kwargs
+            }
+            
+            # Cabeçalhos da requisição
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": f"Bearer {self.api_key}"
+            }
+            
+            # Faz a requisição à API
+            logger.info(f"Enviando requisição para a API da Stability AI")
+            response = requests.post(api_endpoint, headers=headers, json=payload)
+            
+            # Verifica se a requisição foi bem-sucedida
+            if response.status_code == 200:
+                # Processa a resposta
+                result = response.json()
+                frame_paths = []
+                
+                # Salva os frames recebidos
+                frame_paths = []
+                for i, frame_data in enumerate(result.get("frames", [])):
+                    # Decodifica a imagem de base64
+                    image_data = base64.b64decode(frame_data)
+                    frame = Image.open(BytesIO(image_data))
+                    
+                    # Salva o frame
+                    frame_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+                    frame.save(frame_path)
+                    frame_paths.append(frame_path)
+                
+                logger.info(f"Gerados {len(frame_paths)} frames via API Stability")
+                return frame_paths
+            else:
+                logger.error(f"Erro na API da Stability: {response.status_code} - {response.text}")
+                return []
+                
+        except Exception as e:
+            logger.exception(f"Erro ao gerar frames de morphing")
+            return []

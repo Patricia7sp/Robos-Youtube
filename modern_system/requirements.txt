@@ -1,0 +1,32 @@
+# Requisitos básicos
+python-dotenv>=1.0.0
+requests>=2.28.0
+tqdm>=4.64.0
+
+# Processamento de texto e NLP
+openai>=1.0.0
+langchain>=0.0.267
+nltk>=3.8.1
+
+# Geração e processamento de imagens
+pillow>=9.4.0
+numpy>=1.24.0
+stability-sdk>=0.8.0
+
+# Processamento de áudio
+elevenlabs>=0.2.24
+pydub>=0.25.1
+
+# Edição de vídeo
+moviepy>=1.0.3
+ffmpeg-python>=0.2.0
+
+# YouTube API
+google-api-python-client>=2.80.0
+google-auth>=2.16.0
+google-auth-oauthlib>=0.8.0
+google-auth-httplib2>=0.1.0
+
+# Utilitários
+pyyaml>=6.0
+jsonschema>=4.17.3

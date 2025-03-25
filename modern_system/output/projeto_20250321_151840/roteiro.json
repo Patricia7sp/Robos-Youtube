@@ -1,0 +1,358 @@
+[
+  {
+    "scene_number": 1,
+    "title": "Cena 1",
+    "location": null,
+    "characters": [
+      "mamãe",
+      "Mia"
+    ],
+    "narration": "O Professor de Matemática\nEu preciso arrumar um jeito de esconder esses gatinhos. Já é a segunda vez que Mia dá cria, mas desta vez ela exagerou e vieram logo oito. Mamãe disse que só suportaria três de cada vez, pois as nossas já são muito levadas e gostam de se enredar nas meadas de lã quando estamos tentando tricotar. Não que eu saiba tricotar. Mas posso segurar a lã para mamãe e ir desembaraçando os fios, enquanto as gatas tentam, por sua vez, caçar os novelos, o que sempre me faz estourar de rir.",
+    "dialogues": [],
+    "animation_directions": [
+      "Mostrar o cenário: None",
+      "Introduzir personagem: mamãe",
+      "Introduzir personagem: Mia"
+    ],
+    "visual_elements": []
+  },
+  {
+    "scene_number": 2,
+    "title": "Cena 2",
+    "location": "jardim",
+    "characters": [
+      "mamãe",
+      "papai",
+      "Mia",
+      "Lóri"
+    ],
+    "narration": "Filhotes de gato são engraçadinhos e todo mundo gosta deles, mas agora, veja bem, vieram oito de uma vez, e até eu mesma sei que oito não é um número razoável. Talvez eu possa escondê-los no jardim e trazer Mia para visitá-los. Talvez possa roubar pão e leite na cozinha da universidade, já que papai é o reitor, até que consiga convencer mamãe a ficar com todos. Senão eles serão doados como da outra vez, o que me fez chorar muito e ficar inconsolável por quase três dias inteiros.\nMinha irmã Lóri tentou me acalmar, deixando que eu tomasse quanto xarope de groselha quisesse, mas acabei ficando enjoada e mais aborrecida ainda.\n- Pare com essa bobagem! – ela me repreendeu, afinal perdendo a paciência – Você já é grande demais para choramingar assim.\nSempre me dizem isso quando choro, mas o curioso é que outras vezes me acham muito pequena. Por exemplo, quando tenho alguma opinião sobre algo que os adultos estão conversando, ouço coisas como \"Você não tem tamanho para se meter nesse assunto.\" Acho que é por viver escutando admoestações desse tipo que fico confusa e às vezes me sinto mesmo tão grande e às vezes tão pequena.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "los no jardim e trazer Mia para visitá"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Pare com essa bobagem!"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: jardim",
+      "Introduzir personagem: mamãe",
+      "Introduzir personagem: papai",
+      "Introduzir personagem: Mia",
+      "Introduzir personagem: Lóri"
+    ],
+    "visual_elements": [
+      "filhotes",
+      "jardim"
+    ]
+  },
+  {
+    "scene_number": 3,
+    "title": "Cena 3",
+    "location": "jardim",
+    "characters": [
+      "Ludovico",
+      "professor"
+    ],
+    "narration": "Bem, não vejo nesse jardim lugar algum onde esconder os filhotes e olhe que estou procurando cuidadosamente há mais de dez minutos. O jardim da universidade é imenso, e ainda assim está parecendo minúsculo no momento. Ele deve entender como me sinto.\nHá aqui algumas faias bem antigas, de troncos grossos e rugosos. Eu poderia abrigar os bichanos entre suas raízes, mas parece exposto demais se chover. Contudo, tenho medo que se afoguem se eu atravessar para o outro lado e deixá-los muito perto do tanque de peixes.\nEu sei que muita gente acharia que estou tendo trabalho demais para conservar oito simples filhotes, afinal já tenho três gatas, todas fêmeas, e a cada primavera elas podem resolver aparecer com uma nova ninhada. Se eu conseguisse manter todos os gatos por 50 anos e a cada ninhada nascessem 8, então seria 8 vezes 50. Vezes 3, porque são três gatas-mães. Nesse caso eles caberiam todos dentro de casa conosco ou seria preciso que alguém da família se mudasse para um outro lugar? Talvez eu pudesse morar no telhado, se por lá colocassem alguma cobertura no inverno. A conta está errada, tenho que somar ainda 3, que são as gatas originais. De cabeça não vou conseguir calcular, vou pedir a Ludovico que faça isso na hora do chá.\nLudovico é o único que parece entender meu amor pelos animais. Eu não digo só animais que todo mundo gosta, como cavalos, cachorros ou gatos; eu gosto também de lagartas, pássaros e besouros. Agora há pouco, por exemplo, esqueci por completo de que estou procurando um esconderijo, encontrei um formigueiro e me deitei de bruços para acompanhar o caminho das operárias. Poderia ficar assim por horas, elas são muito interessantes. Ludovico uma vez me disse que são capazes de carregar até cem vezes o peso do próprio corpo e ele sabe do que fala porque é professor, mas não de um jeito chato como os outros, e sim de um jeito que fez com que buscássemos uma balança para pesar as formigas e as cargas que carregavam para ver se a teoria estava certa. Infelizmente os insetos não queriam colaborar com a experiência e não paravam quietos, insistindo em escapar pelas laterais do instrumento.\n- Estão ocupadas – Ludovico me explicou, e colocou a última formiga delicadamente de volta ao chão.\nMeu amigo também gosta de animais e eu posso contar tudo para ele, pois nunca diz que sou grande ou pequena demais, apesar de ele mesmo ser, obviamente, grande no tamanho, com pernas e braços tão compridos.\nFora isso, ele não se parece nadinha com um adulto.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "los muito perto do tanque de peixes. Eu sei que muita gente acharia que estou tendo trabalho demais para conservar oito simples filhotes, afinal já tenho três gatas, todas fêmeas, e a cada primavera elas podem resolver aparecer com uma nova ninhada. Se eu conseguisse manter todos os gatos por 50 anos e a cada ninhada nascessem 8, então seria 8 vezes 50. Vezes 3, porque são três gatas"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Estão ocupadas"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: jardim",
+      "Introduzir personagem: Ludovico",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": [
+      "gatos",
+      "filhotes",
+      "jardim"
+    ]
+  },
+  {
+    "scene_number": 4,
+    "title": "Cena 4",
+    "location": "sala de jantar",
+    "characters": [
+      "Edith",
+      "mamãe",
+      "papai",
+      "professor"
+    ],
+    "narration": "A primeira a simpatizar com ele foi mamãe, quando o conheceu. Então ela pediu a papai que convidasse o professor de matemática da universidade para tomar chá. Lori pôde se sentar à mesa com papai, mamãe e a visita, mas eu e Edith não tivemos permissão, porque desta vez éramos pequenas demais, então ficamos espiando pela porta entreaberta da sala de jantar.\nQuando ele chegou, percebi que era alto e magro como um louva-a-Deus, o que me pareceu uma coincidência fantástica, porque mamãe contou que, além de professor de matemática, ele também tinha sido clérigo. Parecia muito tímido e, quando cumprimentou o papai, gaguejou um pouco.\nComeçaram a conversar e logo Edith se cansou. Apanhou uma boneca e sentou-se ao meu lado, mas, nesse momento, percebi que ela não era a única que estava desinteressada da conversa. O professor-clérigo parecia muito distraído e, quando papai lhe fez uma pergunta, ele foi pego de surpresa e respondeu, assustado:\n- O... o q-q-q-que o s-s-senhor disse?\nEra tão óbvio que não tinha ouvido nada desde o começo que não consegui segurar uma risada, que saiu com um arquejo, me deixando imediatamente apavorada com a consequência disso. Todo mundo sabe que crianças bem educadas devem ser vistas e não ouvidas, muito menos ouvidas rindo de uma visita ilustre.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "a"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "se ao meu lado, mas, nesse momento, percebi que ela não era a única que estava desinteressada da conversa. O professor"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "O... o q"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "q"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "s"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: sala de jantar",
+      "Introduzir personagem: Edith",
+      "Introduzir personagem: mamãe",
+      "Introduzir personagem: papai",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": []
+  },
+  {
+    "scene_number": 5,
+    "title": "Cena 5",
+    "location": "mesa",
+    "characters": [
+      "professor",
+      "mamãe",
+      "Edith",
+      "Ludovico"
+    ],
+    "narration": "Todos naquela mesa se voltaram para mim. Minha irmã se enrijeceu, minha mãe se empertigou e as sobrancelhas do meu pai formaram um V perfeito sobre os olhos. \"Vaca, vitela, vime, vespa, viga, voraz\", pensei, rapidamente, para tomar coragem, antes de encarar o professor de matemática.\nMas, para minha surpresa, ele parecia feliz com a interrupção. Seus olhos pousados em mim eram de um azul intenso e profundo e ele tinha uma expressão risonha quando exclamou:\n- Ah! Existem outras crianças na casa!\n- Sim, temos mais duas meninas pequenas. – respondeu mamãe – Mas achamos que elas poderiam incomodar o senhor.\n- A pergunta certa é se eu não irei incomodá- las! – e então ele se dirigiu a mim, como ninguém grande fazia: - Eu incomodo você?\nFiz que não com a cabeça, sem conseguir deixar de sorrir. Eu já estava gostando muito dele.\n- Venham, pequenas. – condescendeu meu pai – Venham cumprimentar o professor.\nEntramos na sala. Fiz uma reverência e Edith tentou repetir aquele sobrenome estranho mas, depois da segunda tentativa, ele a interrompeu, bondosamente:\n- Não precisa me chamar assim, Edith. Nem de senhor. Todas três podem me chamar de Ludovico. É como meus amigos me chamam.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "Ah! Existem outras crianças na casa!"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "respondeu mamãe"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "A pergunta certa é se eu não irei incomodá"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "e então ele se dirigiu a mim, como ninguém grande fazia:"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Venham, pequenas."
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Venham cumprimentar o professor. Entramos na sala. Fiz uma reverência e Edith tentou repetir aquele sobrenome estranho mas, depois da segunda tentativa, ele a interrompeu, bondosamente:"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: mesa",
+      "Introduzir personagem: professor",
+      "Introduzir personagem: mamãe",
+      "Introduzir personagem: Edith",
+      "Introduzir personagem: Ludovico"
+    ],
+    "visual_elements": []
+  },
+  {
+    "scene_number": 6,
+    "title": "Cena 6",
+    "location": "mesa",
+    "characters": [
+      "Ludovico",
+      "Lóri",
+      "Edith",
+      "professor"
+    ],
+    "narration": "Tomamos nossos lugares à mesa. Quando comecei a colocar açúcar no chá, ele olhou para mim, parecendo muito espantado, e perguntou:\n- O que é isso?!\n- Isso o que?\n- Dentro do açucareiro!\nOlhei mais de perto, Edith trepou na cadeira e até Lóri se aproximou. Ludovico tirou a tampa, tapou a abertura com a mão e sussurrou:\n- Está se mexendo.\nO açucareiro trepidou.\nLudovico aproximou o rosto e espiou por entre os dedos.\n- Contem até três! – pediu – É um ratinho branco. Vou tirá-lo daí.\n- Um! – disse Lóri, tentando espiar também.\n- Dois! – eu sussurrei, com a respiração suspensa.\n- Três! – gritou Edith, com os olhos arregalados.\nE então o professor tirou a mão e algo branco saltou para fora do açucareiro, enquanto nós três gritávamos:\n- Um ratinho!!!\nE lá estava Ludovico, um alvo guardanapo dobrado nas mãos, piscando alegremente os olhos azuis.\n- Faz de novo! – pediu Lóri, sem conseguir se conter.\nO professor riu:\n- Mágica só se faz uma vez, senão ela perde a graça.\n- O senhor sabe fazer outras mágicas? – perguntou Edith, os olhos brilhando.\n- Faz mais uma! Faz outra! – nós três implorávamos, na maior algazarra.\nAté meus pais estavam rindo.\nAquela foi a primeira demonstração dos vários truques de ilusionismo que Ludovico sabia fazer. Gostaria que ele estivesse aqui agora, porque assim, quem sabe, fizesse surgir um bom esconderijo num passe de mágica. Mas ele está em horário de aula e meu pai proibiu que o perturbemos nessas ocasiões pois, segundo ele, já o obrigamos a ficar conosco por tempo demais. \"Principalmente você, mocinha\", acrescentou, olhando severamente para mim.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "O que é isso?!"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Dentro do açucareiro! Olhei mais de perto, Edith trepou na cadeira e até Lóri se aproximou. Ludovico tirou a tampa, tapou a abertura com a mão e sussurrou:"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Contem até três!"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "É um ratinho branco. Vou tirá"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Um!"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Dois!"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Três!"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Um ratinho!!! E lá estava Ludovico, um alvo guardanapo dobrado nas mãos, piscando alegremente os olhos azuis."
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "pediu Lóri, sem conseguir se conter. O professor riu:"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "O senhor sabe fazer outras mágicas?"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Faz mais uma! Faz outra!"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: mesa",
+      "Introduzir personagem: Ludovico",
+      "Introduzir personagem: Lóri",
+      "Introduzir personagem: Edith",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": [
+      "açucareiro",
+      "ratinho"
+    ]
+  },
+  {
+    "scene_number": 7,
+    "title": "Cena 7",
+    "location": null,
+    "characters": [
+      "Ludovico",
+      "professor"
+    ],
+    "narration": "É verdade que muitas tardes se passam com o professor Ludovico. Mas \"obrigar\" não é um termo justo, pois ele gosta de estar conosco tanto quanto gostamos de estar com ele. Porque ele não só sabe fazer mágicas, como é capaz de criar invenções mirabolantes, que nos mostra quando eu e minhas irmãs vamos visitá-lo. Também gosta de montar quebra cabeças e de jogar cartas. O baralho dele tem uma dama de copas muito esquisita e que me parece um pouco assustadora. Ele diz que não é uma dama, é uma rainha, e que tem essa expressão ameaçadora porque é ela quem manda no reino e até o próprio rei a obedece. Muitas vezes nós alteramos as regras dos jogos. Com o xadrez, por exemplo, eu e ele criamos uma espécie de jogo animado, onde as peças falam e brigam entre si. Quando se vê em perigo, um peão pode montar em um cavalo e fugir a galope. E quando a rainha consegue eliminar uma das peças adversárias, tem que gritar bem alto:\n- COOOOOOOORTEM-LHE A CABEEEEEEÇA!!!\nSe todo mundo fosse como Ludovico, eu poderia ter quantos bichos quisesse.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "lo. Também gosta de montar quebra cabeças e de jogar cartas. O baralho dele tem uma dama de copas muito esquisita e que me parece um pouco assustadora. Ele diz que não é uma dama, é uma rainha, e que tem essa expressão ameaçadora porque é ela quem manda no reino e até o próprio rei a obedece. Muitas vezes nós alteramos as regras dos jogos. Com o xadrez, por exemplo, eu e ele criamos uma espécie de jogo animado, onde as peças falam e brigam entre si. Quando se vê em perigo, um peão pode montar em um cavalo e fugir a galope. E quando a rainha consegue eliminar uma das peças adversárias, tem que gritar bem alto:"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: None",
+      "Introduzir personagem: Ludovico",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": [
+      "xadrez",
+      "peças",
+      "baralho",
+      "dama de copas"
+    ]
+  },
+  {
+    "scene_number": 8,
+    "title": "Cena 8",
+    "location": "toca",
+    "characters": [
+      "Alice",
+      "Ludovico",
+      "professor"
+    ],
+    "narration": "E por falar nisso, estou vendo uma toca. Está bem no barranco, um buraco comprido e fundo. Fui avisada muitas vezes para jamais mexer nesses buracos, porque nunca dá para saber a qual animal pertencem. Às vezes são de raposas, mas podem também ser de cobras ou de outros bichos venenosos. Imagino que poderia abrigar os meus gatinhos ali, se o dono fosse um bom anfitrião. Poderia ser um caxinguelê bem velhinho e simpático, que gostasse da ideia de ter netos, e então ele diria: \"Venham, meus queridos, vou cuidar de vocês enquanto sua dona Alice convence a mãe dela a não distribui-los por aí. Deitem-se quietinhos e não mexam no meu tricô.\"\nEsse é o tipo de coisa que Ludovico inventaria, porque, além de tudo, ele é também um grande contador de histórias. E elas são sempre engraçadas, um pouco sem pé nem cabeça.\n- Não sei como um matemático pode ter tanta imaginação, Dodgson!, ouvi meu pai dizer certa vez ao professor Ludovico, que respondeu, pensativamente:\n- Uso a matemática para tentar ordenar um pouco o caos porque a vida, Henry, a vida me parece frequentemente um tanto ou quanto absurda.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "los por aí. Deitem"
+      },
+      {
+        "speaker": "Desconhecido",
+        "text": "Não sei como um matemático pode ter tanta imaginação, Dodgson!, ouvi meu pai dizer certa vez ao professor Ludovico, que respondeu, pensativamente:"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: toca",
+      "Introduzir personagem: Alice",
+      "Introduzir personagem: Ludovico",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": [
+      "toca"
+    ]
+  },
+  {
+    "scene_number": 9,
+    "title": "Cena 9",
+    "location": "toca",
+    "characters": [],
+    "narration": "Parece que a toca afinal é de um coelho, que estava com pressa demais de entrar nela e nem teve tempo de me dar atenção. Eu poderia me enfiar atrás dele, agora que sei que não é moradia de nenhum animal perigoso, mas que profundidade terá? Não quero cair no centro da Terra.",
+    "dialogues": [],
+    "animation_directions": [
+      "Mostrar o cenário: toca"
+    ],
+    "visual_elements": [
+      "toca",
+      "coelho"
+    ]
+  },
+  {
+    "scene_number": 10,
+    "title": "Cena 10",
+    "location": "jardim",
+    "characters": [
+      "Ludovico",
+      "professor"
+    ],
+    "narration": "Acabei de ter uma ideia melhor: vou pedir ao professor Ludovico que cuide dos gatinhos para mim. Ele não irá negar porque sei que sou sua menina Liddle preferida. Vai mantê-los seguros e eu poderei visitá-los todos os dias, até que cresçam. Contarei a ele minha aventura no jardim e explicarei que não achei nenhum lugar adequado para escondê-los.",
+    "dialogues": [
+      {
+        "speaker": "Desconhecido",
+        "text": "los seguros e eu poderei visitá"
+      }
+    ],
+    "animation_directions": [
+      "Mostrar o cenário: jardim",
+      "Introduzir personagem: Ludovico",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": [
+      "jardim"
+    ]
+  },
+  {
+    "scene_number": 11,
+    "title": "Cena 11",
+    "location": "barco",
+    "characters": [
+      "Ludovico",
+      "Lóri",
+      "Edith",
+      "mamãe",
+      "professor"
+    ],
+    "narration": "Preciso resolver essa questão logo porque amanhã o professor Charles Lutwidge Dodgson, vulgo Ludovico e o amigo dele, o senhor Robinson Duckworth (que ele chama de Duck) farão um piquenique seguido de um passeio de barco pelo Tâmisa. Eles pediram permissão a mamãe para levar Lóri, Edith e eu a bordo. Ela disse que poderemos participar da excursão se o tempo estiver firme. O dia hoje foi morno e agradável, creio que amanhã será igual e que nossos planos darão certo. Vou levar tortas de ameixas, quem sabe Ludovico esteja em boa disposição e nos conte uma de suas histórias.",
+    "dialogues": [],
+    "animation_directions": [
+      "Mostrar o cenário: barco",
+      "Introduzir personagem: Ludovico",
+      "Introduzir personagem: Lóri",
+      "Introduzir personagem: Edith",
+      "Introduzir personagem: mamãe",
+      "Introduzir personagem: professor"
+    ],
+    "visual_elements": []
+  }
+]

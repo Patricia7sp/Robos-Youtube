@@ -1,0 +1,25 @@
+{
+  "characters": {
+    "Lóri": "[Simulado] Lóri.png",
+    "Ludovico": "[Simulado] Ludovico.png",
+    "papai": "[Simulado] papai.png",
+    "Alice": "[Simulado] Alice.png",
+    "Mia": "[Simulado] Mia.png",
+    "Edith": "[Simulado] Edith.png",
+    "professor": "[Simulado] professor.png",
+    "mamãe": "[Simulado] mamãe.png"
+  },
+  "scenes": {
+    "1": "[Simulado] scene_1.png",
+    "2": "[Simulado] scene_2.png",
+    "3": "[Simulado] scene_3.png",
+    "4": "[Simulado] scene_4.png",
+    "5": "[Simulado] scene_5.png",
+    "6": "[Simulado] scene_6.png",
+    "7": "[Simulado] scene_7.png",
+    "8": "[Simulado] scene_8.png",
+    "9": "[Simulado] scene_9.png",
+    "10": "[Simulado] scene_10.png",
+    "11": "[Simulado] scene_11.png"
+  }
+}

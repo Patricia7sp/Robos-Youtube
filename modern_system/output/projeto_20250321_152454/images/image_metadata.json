@@ -1,0 +1,25 @@
+{
+  "characters": {
+    "Lóri": "lóri.png",
+    "Edith": "edith.png",
+    "Mia": "mia.png",
+    "papai": "papai.png",
+    "professor": "professor.png",
+    "Ludovico": "ludovico.png",
+    "Alice": "alice.png",
+    "mamãe": "mamãe.png"
+  },
+  "scenes": {
+    "1": "scene_001.png",
+    "2": "scene_002.png",
+    "3": "scene_003.png",
+    "4": "scene_004.png",
+    "5": "scene_005.png",
+    "6": "scene_006.png",
+    "7": "scene_007.png",
+    "8": "scene_008.png",
+    "9": "scene_009.png",
+    "10": "scene_010.png",
+    "11": "scene_011.png"
+  }
+}
