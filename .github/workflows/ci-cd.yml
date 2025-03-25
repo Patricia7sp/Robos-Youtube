@@ -1,0 +1,59 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+      
+      - name: Initialize Terraform
+        run: |
+          cd terraform
+          terraform init
+      
+      - name: Validate Terraform
+        run: |
+          cd terraform
+          terraform validate
+      
+      - name: Plan Terraform
+        run: |
+          cd terraform
+          terraform plan -out=tfplan
+      
+      - name: Apply Terraform
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd terraform
+          terraform apply -auto-approve tfplan
+      
+      - name: Run Tests
+        run: |
+          # Aqui você pode adicionar testes específicos do seu projeto
+          echo "Running tests..."
+      
+      - name: Build and Deploy
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Aqui você pode adicionar os comandos de build e deploy do seu projeto
+          echo "Building and deploying..."
+      
+      - name: Cleanup
+        run: |
+          cd terraform
+          terraform destroy -auto-approve
